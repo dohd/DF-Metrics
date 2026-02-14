@@ -225,7 +225,7 @@ if (!function_exists('rankTeamsFromScores')) {
 if (!function_exists('confirmTeamCompositionUpdated')) {
     function confirmTeamCompositionUpdated() {
         $team = optional(auth()->user()->team);
-        foreach ($team->team_sizes as $item) {
+        foreach ($team->team_sizes ?? [] as $item) {
             $startPeriod = Carbon\Carbon::parse($item->start_period);
             $startMonth = Carbon\Carbon::today()->startOfMonth();
             $endMonth =  Carbon\Carbon::today()->endOfMonth();
