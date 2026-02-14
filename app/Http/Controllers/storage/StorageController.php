@@ -32,6 +32,14 @@ class StorageController extends Controller
             $file_path .= $value . DIRECTORY_SEPARATOR;
         }
 
+        // Remove trailing slash if present
+        $file_path = rtrim($file_path, DIRECTORY_SEPARATOR);
+
+        // Check if file exists in the public disk
+        if (!Storage::disk('public')->exists($file_path)) {
+            abort(404, 'File not found.');
+        }
+
         return Storage::disk('public')->download($file_path);
     }
 }
