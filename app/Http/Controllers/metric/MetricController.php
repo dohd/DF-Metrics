@@ -174,10 +174,10 @@ class MetricController extends Controller
     public function edit(Metric $metric)
     {
         // restric non-chair users from editing scored metrics
-        if ($metric->in_score && auth()->user()->user_type !== 'chair') {
-            return redirect()->route('metrics.index')
-            ->with('error', "You don't sufficient rights to perform this action!");
-        }
+        // if ($metric->in_score && auth()->user()->user_type !== 'chair') {
+        //     return redirect()->route('metrics.index')
+        //     ->with('error', "You don't sufficient rights to perform this action!");
+        // }
 
         // captain team composition error
         if (!confirmTeamCompositionUpdated()) {
@@ -284,9 +284,9 @@ class MetricController extends Controller
     public function destroy(Metric $metric)
     {
         // restric non-chair users from deleting scored metrics
-        if ($metric->in_score && auth()->user()->user_type != 'chair') {
-            return errorHandler("You don't have rights to delete this metric!");
-        }
+        // if ($metric->in_score && auth()->user()->user_type != 'chair') {
+        //     return errorHandler("You don't have rights to delete this metric!");
+        // }
 
         try {
             DB::beginTransaction();

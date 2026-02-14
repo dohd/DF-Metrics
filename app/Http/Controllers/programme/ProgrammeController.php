@@ -90,9 +90,9 @@ class ProgrammeController extends Controller
     {
         // permit only the chair to edit 
         $hasScores = $programme->assignScores()->exists();
-        if ($hasScores && auth()->user()->user_type != 'chair') {
-            return errorHandler("You don't have the rights to edit this program");
-        }
+        // if ($hasScores && auth()->user()->user_type != 'chair') {
+        //     return errorHandler("You don't have the rights to edit this program");
+        // }
 
         $cumulativeProgrammes = Programme::where('metric', 'Finance')
         ->where('id', '!=', $programme->id)
@@ -153,9 +153,9 @@ class ProgrammeController extends Controller
     {
         // permit only the chair to edit 
         $hasScores = $programme->assignScores()->exists();
-        if ($hasScores && auth()->user()->user_type != 'chair') {
-            return errorHandler("You don't have the rights to delete this program");
-        }
+        // if ($hasScores && auth()->user()->user_type != 'chair') {
+        //     return errorHandler("You don't have the rights to delete this program");
+        // }
 
         try {            
             $programme->delete();

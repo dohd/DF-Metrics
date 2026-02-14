@@ -33,10 +33,10 @@ class TeamController extends Controller
     public function create()
     {
         // permit only chair to create a team 
-        if (auth()->user()->user_type !== 'chair') {
-            return redirect()->route('teams.index')
-                ->with('error', "You don't have sufficient rights to perform this action!");
-        }
+        // if (auth()->user()->user_type !== 'chair') {
+        //     return redirect()->route('teams.index')
+        //         ->with('error', "You don't have sufficient rights to perform this action!");
+        // }
 
         return view('teams.create');
     }
@@ -245,9 +245,9 @@ class TeamController extends Controller
     public function destroy(Team $team)
     {
         // permit only chair to delete a team 
-        if (auth()->user()->user_type != 'chair') {
-            return errorHandler("You don't have the rights to delete a team!");
-        }
+        // if (auth()->user()->user_type != 'chair') {
+        //     return errorHandler("You don't have the rights to delete a team!");
+        // }
 
         try {   
             DB::beginTransaction();    
