@@ -71,8 +71,10 @@ class User extends Authenticatable
         parent::boot();
 
         static::creating(function ($instance) {
-            $instance->created_by = auth()->user()->id;
-            $instance->ins = auth()->user()->ins;
+            if (auth()->id()) {
+                $instance->created_by = auth()->user()->id;
+                $instance->ins = auth()->user()->ins;                
+            }
             return $instance;
         });
 
