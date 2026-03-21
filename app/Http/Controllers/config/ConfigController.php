@@ -29,6 +29,7 @@ class ConfigController extends Controller
         try {
             Artisan::call('cache:clear');
             Artisan::call('route:cache');
+            Artisan::call('view:clear');
             Artisan::call('config:cache');
             return "Application cache cleared";
         } catch (\Throwable $th) {
