@@ -63,6 +63,12 @@
           <i class="bi bi-people"></i><span>Teams</span>
         </a>
       </li>
+      <!-- Member List -->
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="{{ route('memberlists.index') }}">
+          <i class="bi bi-person-lines-fill"></i></i><span>DF Member List</span>
+        </a>
+      </li>  
 
       <!-- Reports -->
       <li class="nav-heading">Report Center</li>
@@ -73,12 +79,12 @@
         <a class="nav-link collapsed" href="{{ route('reports.team_size_summary') }}">
           <i class="bi bi-circle"></i><span>Team Size Summary</span>
         </a>
-        <a class="nav-link collapsed" href="{{ route('reports.monthly_pledge') }}">
+        {{-- <a class="nav-link collapsed" href="{{ route('reports.monthly_pledge') }}">
           <i class="bi bi-circle"></i><span>Monthly Pledge Vs Actual</span>
         </a>
         <a class="nav-link collapsed" href="{{ route('reports.monthly_pledge_vs_mission') }}">
           <i class="bi bi-circle"></i><span>Monthly Pledge & Mission</span>
-        </a>
+        </a> --}}
         <a class="nav-link collapsed" href="{{ route('reports.score_variance') }}">
           <i class="bi bi-circle"></i><span>Score Variance</span>
         </a>
@@ -117,12 +123,6 @@
           <i class="bi bi-back"></i><span>Departments</span>
         </a>
       </li>
-      <!-- Member List -->
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="{{ route('memberlists.index') }}">
-          <i class="bi bi-person-lines-fill"></i></i><span>DF Member List</span>
-        </a>
-      </li>  
       <!-- user management -->
       <li class="nav-item">
         <a class="nav-link collapsed" href="{{ route('user_profiles.index') }}">
