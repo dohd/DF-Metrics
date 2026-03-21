@@ -62,7 +62,7 @@ class TeamController extends Controller
         try {    
             DB::beginTransaction();
 
-            $basicDetails['max_guest'] = numberClean($basicDetails['max_guest']);
+            // $basicDetails['max_guest'] = numberClean($basicDetails['max_guest']);
             $team = Team::create($basicDetails);
 
             $n = count($memberDetails['full_name']);
@@ -141,7 +141,7 @@ class TeamController extends Controller
         try {   
             DB::beginTransaction();
 
-            $basicDetails['max_guest'] = numberClean($basicDetails['max_guest']);
+            // $basicDetails['max_guest'] = numberClean($basicDetails['max_guest']);
             $basicDetails['is_active'] = $basicDetails['is_active'] ?? null; 
             $team->update($basicDetails);
 

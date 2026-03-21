@@ -11,12 +11,6 @@
         {{ Form::text('name', null, ['class' => 'form-control', 'required' => 'required']) }}
     </div>
 </div>
-<div class="row mb-3">
-    <label for="guest" class="col-md-2">Max Guest Size</label>
-    <div class="col-md-8 col-12">
-        {{ Form::number('max_guest', null, ['class' => 'form-control', 'placeholder' => 'No. of maximum guest members', 'required' => 'required']) }}
-    </div>
-</div>
 
 <div class="mt-2 mb-3" style="width:85%; margin-left:auto; margin-right:auto">
     {{-- ========= MASTER TABLE ========= --}}
