@@ -146,13 +146,13 @@
       <li class="nav-heading">Study Session</li>
       <!-- Study Materials -->
       <li class="nav-item">
-        <a class="nav-link collapsed" href="{{ route('narratives.index') }}">
+        <a class="nav-link collapsed" href="{{ route('study_materials.index') }}">
           <i class="bi bi-archive-fill"></i></i><span>Study Materials</span>
         </a>
       </li>
       <!-- Testimonials -->
       <li class="nav-item">
-        <a class="nav-link collapsed" href="{{ route('case_studies.index') }}">
+        <a class="nav-link collapsed" href="{{ route('testimonials.index') }}">
           <i class="bi bi-card-list"></i></i><span>Study Testimonials</span>
         </a>
       </li> 
@@ -163,14 +163,18 @@
           <i class="bi bi-list-check"></i><span>Metrics</span>
         </a>
       </li>
-      @if (in_array(auth()->user()->user_type, ['shepherd']))
-        <!-- teams -->
-        <li class="nav-item">
-          <a class="nav-link collapsed" href="{{ route('teams.index') }}">
-            <i class="bi bi-people"></i><span>Teams</span>
-          </a>
-        </li>
-      @endif
+      <!-- teams -->
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="{{ route('teams.index') }}">
+          <i class="bi bi-people"></i><span>Teams</span>
+        </a>
+      </li>
+      <!-- Member List -->
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="{{ route('memberlists.index') }}">
+          <i class="bi bi-person-lines-fill"></i></i><span>DF Member List</span>
+        </a>
+      </li>  
 
       <!-- Reports -->
       <li class="nav-heading">Report Center</li>

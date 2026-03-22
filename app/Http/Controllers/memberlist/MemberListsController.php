@@ -3,22 +3,14 @@
 namespace App\Http\Controllers\memberlist;
 
 use App\Http\Controllers\Controller;
-use App\Models\action_plan\ActionPlan;
 use App\Models\age_group\AgeGroup;
-use App\Models\cohort\Cohort;
 use App\Models\department\Department;
 use App\Models\dfname\DFName;
-use App\Models\disability\Disability;
-use App\Models\item\ProposalItem;
 use App\Models\memberlist\Memberlist;
-use App\Models\memberlist\MemberlistItem;
 use App\Models\ministry\Ministry;
-use App\Models\proposal\Proposal;
-use App\Models\region\Region;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Validator;
 
 class MemberListsController extends Controller
 {
@@ -59,29 +51,49 @@ class MemberListsController extends Controller
     {
         $request->validate([
             'date' => 'required',
-            'dfname_id' => 'required',
+            'dfname_id' => 'required|unique:memberlists,dfname_id',
+            'memberlist_items' => 'required|array|min:1',
+        ],
+        [
+            'dfname_id.unique' => 'This DF Name already exists',
         ]);
 
         $input = $request->only('date', 'dfname_id');
+        $inputItems = $request->memberlist_items;
        
         try {
             DB::beginTransaction();
 
-            $input = inputClean($input);
-            $memberlist = Memberlist::create($input);
+            // create memberlist
+            $input = inputClean($input); 
+            $memberlist = Memberlist::create($input); 
 
-            $input_items = $request->memberlist_items;
-            foreach ($input_items as $key => $value) {
-                $input_items[$key] = array_replace($value, [
-                    'memberlist_id' => $memberlist->id,
+            // create memberlist items
+            foreach ($inputItems as $value) {
+                unset($value['memberlist_item_id']);
+               $memberlist->items()->create($value);
+            }
+
+            // create team
+            $team = $memberlist->team()->create([
+                'dfname_id' => $memberlist->dfname->id,
+                'name' => $memberlist->dfname->name,
+            ]);
+            // create team members
+            foreach ($memberlist->items as $item) {
+                $team->members()->create([
+                    'memberlist_item_id' => $item->id,
+                    'full_name' => $item->member_name,
+                    'df_name' => $memberlist->dfname->name,
+                    'phone_no' => $item->phone_no,
+                    'physical_addr' => $item->residence,
                 ]);
             }
-            MemberlistItem::insert($input_items);
 
             DB::commit();
-            return redirect(route('memberlists.index'))->with(['success' => 'Family Member List created successfully']);
+            return redirect(route('memberlists.index'))->with(['success' => 'Member List created successfully']);
         } catch (\Throwable $th) {
-            return errorHandler('Error creating Family Member List!', $th);
+            return errorHandler('Error creating Member List!', $th);
         }
     }
 
@@ -123,30 +135,64 @@ class MemberListsController extends Controller
     {
         $request->validate([
             'date' => 'required',
-            'dfname_id' => 'required',
+            'dfname_id' => 'required|unique:memberlists,dfname_id,' . $memberlist->id . ',id',
+            'memberlist_items' => 'required|array|min:1',
+        ],
+        [
+            'dfname_id.unique' => 'The selected DF Name already exists',
         ]);
 
         $input = $request->only('date', 'dfname_id');
-
-        try {     
+        $inputItems = $request->memberlist_items;
+       
+        try {
             DB::beginTransaction();
 
-            $input = inputClean($input);
-            $memberlist->update($input);
+            // create memberlist
+            $input = inputClean($input); 
+            $memberlist->update($input); 
 
-            $input_items = $request->memberlist_items;
-            foreach ($input_items as $key => $value) {
-                $input_items[$key] = array_replace($value, [
-                    'memberlist_id' => $memberlist->id,
-                ]);
+            // create memberlist items
+            foreach ($inputItems as $value) {
+                $id = $value['memberlist_item_id'];
+                unset($value['memberlist_item_id']);
+                if (empty($id)) $memberlist->items()->create($value);
+                else $memberlist->items()->where('id', $id)->update($value); 
             }
-            $memberlist->items()->delete();
-            MemberlistItem::insert($input_items);
+
+            // create team if none exists
+            if (empty($memberlist->team)) {
+                $team = $memberlist->team()->create([
+                    'dfname_id' => $memberlist->dfname->id,
+                    'name' => $memberlist->dfname->name,
+                ]);
+                // create team members
+                foreach ($memberlist->items as $item) {
+                    $team->members()->create([
+                        'memberlist_item_id' => $item->id,
+                        'full_name' => $item->member_name,
+                        'df_name' => $memberlist->dfname->name,
+                        'phone_no' => $item->phone_no,
+                        'physical_addr' => $item->residence,
+                    ]);
+                }                
+            } else {
+                $memberlist->team()->update(['name' => $memberlist->dfname->name]);
+                foreach ($memberlist->items as $item) {
+                    $memberlist->team->members()
+                    ->updateOrCreate(['memberlist_item_id' => $item->id], [
+                        'full_name' => $item->member_name,
+                        'df_name' => $memberlist->dfname->name,
+                        'phone_no' => $item->phone_no,
+                        'physical_addr' => $item->residence,
+                    ]);                                        
+                }
+            }
 
             DB::commit();
-            return redirect(route('memberlists.index'))->with(['success' => 'Family Member List updated successfully']);              
+            return redirect(route('memberlists.index'))->with(['success' => 'Member List updated successfully']);
         } catch (\Throwable $th) {
-            return errorHandler('Error updating Family Member List!', $th);
+            return errorHandler('Error updating Member List!', $th);
         }
     }
 
@@ -158,12 +204,23 @@ class MemberListsController extends Controller
      */
     public function destroy(Memberlist $memberlist)
     {
+        if ($memberlist->team) {
+            return errorHandler('Member list has an associated team #' . tidCode('', $memberlist->team->tid));
+        }
+
         try {
+            DB::beginTransaction();
+
+            $memberlist->team->members()->delete();
+            $memberlist->team()->delete();
+
             $memberlist->items()->delete();
             $memberlist->delete();
-            return redirect(route('memberlists.index'))->with(['success' => 'Family Member List deleted successfully']);
+
+            DB::commit();
+            return redirect(route('memberlists.index'))->with(['success' => 'Member List deleted successfully']);
         } catch (\Throwable $th) {
-            return errorHandler('Error deleting Family Member List!', $th);
+            return errorHandler('Error deleting Member List!', $th);
         }
     }
 

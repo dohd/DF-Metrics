@@ -69,7 +69,7 @@ class Memberlist extends Model
         });
 
         static::addGlobalScope('ins', function ($builder) {
-            if (auth()->id()) {
+            if (isset(auth()->user()->ins)) {
                 $builder->where('ins', auth()->user()->ins);                
             }
         });

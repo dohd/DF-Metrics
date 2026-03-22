@@ -3,6 +3,7 @@
 namespace App\Models\team\Traits;
 
 use App\Models\assign_score\AssignScore;
+use App\Models\memberlist\Memberlist;
 use App\Models\metric\Metric;
 use App\Models\programme\Programme;
 use App\Models\team\TeamMember;
@@ -11,6 +12,11 @@ use App\Models\team\VerifyMember;
 
 trait TeamRelationship
 {
+    public function memberlist()
+    {
+        return $this->belongsTo(Memberlist::class);
+    }
+
     public function verify_members()
     {
         return $this->hasMany(VerifyMember::class);

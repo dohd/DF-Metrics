@@ -4,7 +4,7 @@
         <select name="dfzone_id" id="dfzone" class="form-select">
             <option value="">-- Select DF Zone --</option>
             @foreach ($dfzones as $zone)
-                <option value="{{ $zone->id }}" {{ @$dfname->zone_id == $zone->id? 'selected' : '' }}>
+                <option value="{{ $zone->id }}" {{ @$dfname->dfzone_id === $zone->id? 'selected' : '' }}>
                     {{ $zone->name }}
                 </option>
             @endforeach
