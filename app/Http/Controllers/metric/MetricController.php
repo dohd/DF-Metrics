@@ -20,6 +20,12 @@ class MetricController extends Controller
      */
     public function index()
     {
+        // team composition error
+        // session()->pull('warning');
+        if (!confirmTeamCompositionUpdated() && !session('warning')) {
+            // session(['warning' => 'Updated team composition is required!']);
+        }
+
         $programmes = Programme::where('is_active', 1)->get();
         $teams = Team::where('is_active', 1)->get();
 
@@ -61,12 +67,6 @@ class MetricController extends Controller
      */
     public function create()
     {   
-        // captain team composition error
-        if (!confirmTeamCompositionUpdated()) {
-            return redirect()->route('metrics.index')
-            ->with('error', 'Updated team composition is required!');
-        }
-
         $teams = Team::get();
         $programmes = Programme::where('is_active', 1)->get();
 
@@ -182,10 +182,10 @@ class MetricController extends Controller
         // }
 
         // captain team composition error
-        if (!confirmTeamCompositionUpdated()) {
-            return redirect()->route('metrics.index')
-            ->with('error', 'Updated team composition is required!');
-        }
+        // if (!confirmTeamCompositionUpdated()) {
+        //     return redirect()->route('metrics.index')
+        //     ->with('error', 'Updated team composition is required!');
+        // }
 
         $teams = Team::get();
         $programmes = Programme::get();
@@ -340,9 +340,10 @@ class MetricController extends Controller
             ->whereHas('verify_members', fn($q) => $q->whereYear('date', $year))
             ->with([
                 'metricMembers' => function($q) {
-                    $q->select('id', 'team_member_id', 'checked')
-                    ->where('team_id', request('team_id'));
-                }
+                    $q->where('team_id', request('team_id'))
+                    ->select('id', 'team_member_id', 'checked');
+                },
+                'verify_members' => fn($q) => $q->select('id', 'team_member_id', 'category'),
             ])
             ->get();
 

@@ -143,11 +143,14 @@
 <div class="row mb-3">
     <label for="memo" class="col-md-2">Memo</label>
     <div class="col-md-8 col-12">
-        {{ Form::textarea('memo', null, ['class' => 'form-control', 'rows' => '1']) }}
+        {{-- Form::textarea('memo', null, ['class' => 'form-control', 'rows' => '1']) --}}
+        {{ Form::hidden('memo', null, ['id' => 'memo']) }}
+        <div class="richtext" id="memo_text">{!! @$metric->memo !!}</div>
     </div>
 </div>
 
-<div class="mt-2 mb-3" style="width:85%; margin-left:auto; margin-right:auto">
+<!-- Confirm Members Section -->
+<div class="mt-5 mb-3" style="width:85%; margin-left:auto; margin-right:auto">
     <div class="border rounded p-3 bg-white mb-3">
         <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
             <div class="fw-semibold">
@@ -168,6 +171,7 @@
         </div>                            
     </div>    
 </div>
+<br><br>
 
 @section('script')
 <script>

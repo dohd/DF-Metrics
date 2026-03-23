@@ -57,24 +57,28 @@
           <i class="bi bi-kanban"></i><span>Rating Scale</span>
         </a>
       </li>
-      <!-- teams -->
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="{{ route('teams.index') }}">
-          <i class="bi bi-people"></i><span>Teams</span>
-        </a>
-      </li>
       <!-- Member List -->
       <li class="nav-item">
         <a class="nav-link collapsed" href="{{ route('memberlists.index') }}">
           <i class="bi bi-person-lines-fill"></i></i><span>DF Member List</span>
         </a>
       </li>  
+      <!-- teams -->
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="{{ route('teams.index') }}">
+          <i class="bi bi-people"></i><span>Teams</span>
+        </a>
+      </li>
+      
 
       <!-- Reports -->
       <li class="nav-heading">Report Center</li>
       <li class="nav-item">
         <a class="nav-link collapsed" href="{{ route('reports.metric_summary') }}">
-          <i class="bi bi-circle"></i><span>Program Metrics Summary</span>
+          <i class="bi bi-circle"></i><span>Metrics Summary</span>
+        </a>
+        <a class="nav-link collapsed" href="{{ route('reports.team_member_summary') }}">
+          <i class="bi bi-circle"></i><span>Team Members Summary</span>
         </a>
         <a class="nav-link collapsed" href="{{ route('reports.team_size_summary') }}">
           <i class="bi bi-circle"></i><span>Team Size Summary</span>
@@ -156,31 +160,40 @@
           <i class="bi bi-card-list"></i></i><span>Study Testimonials</span>
         </a>
       </li> 
+      <!-- Narrative Report -->
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="{{ route('narratives.index') }}">
+          <i class="bi bi-card-list"></i></i><span>Narrative Reports</span>
+        </a>
+      </li> 
       <li class="nav-heading">Metrics & Scores</li>
-      <!-- metric input -->
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="{{ route('metrics.index') }}">
-          <i class="bi bi-list-check"></i><span>Metrics</span>
-        </a>
-      </li>
-      <!-- teams -->
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="{{ route('teams.index') }}">
-          <i class="bi bi-people"></i><span>Teams</span>
-        </a>
-      </li>
       <!-- Member List -->
       <li class="nav-item">
         <a class="nav-link collapsed" href="{{ route('memberlists.index') }}">
           <i class="bi bi-person-lines-fill"></i></i><span>DF Member List</span>
         </a>
       </li>  
+      <!-- teams -->
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="{{ route('teams.index') }}">
+          <i class="bi bi-people"></i><span>Teams</span>
+        </a>
+      </li>
+      <!-- metric input -->
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="{{ route('metrics.index') }}">
+          <i class="bi bi-list-check"></i><span>Metrics</span>
+        </a>
+      </li>
 
       <!-- Reports -->
       <li class="nav-heading">Report Center</li>
       <li class="nav-item">
         <a class="nav-link collapsed" href="{{ route('reports.metric_summary') }}">
           <i class="bi bi-circle"></i><span>Metric Summary</span>
+        </a>
+        <a class="nav-link collapsed" href="{{ route('reports.team_member_summary') }}">
+          <i class="bi bi-circle"></i><span>Team Member Summary</span>
         </a>
         <a class="nav-link collapsed" href="{{ route('reports.team_size_summary') }}">
           <i class="bi bi-circle"></i><span>Team Size Summary</span>

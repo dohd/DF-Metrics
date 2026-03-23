@@ -7,7 +7,6 @@
         <td>{{ @$row->team->name }}</td>
         <td>{!! $row->is_approved? '<span class="badge bg-success">Appr</span>' : '<span class="badge bg-secondary">N/Appr</span>' !!}</td>
         <td>{!! $row->in_score? '<span class="badge bg-success">Scored</span>' : '<span class="badge bg-secondary">N/Score</span>' !!}</td>
-        <td>{{ @$row->memo }}</td>
         <td>{!! $row->action_buttons !!}</td>
     </tr>
 @endforeach

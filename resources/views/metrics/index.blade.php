@@ -66,7 +66,7 @@
         <div class="card-body">
             <div class="card-content p-2">
                 <div class="overflow-auto">
-                    <div class="mb-2">
+                    <div class="m-2">
                         <span id="approveBtn" role="button" class="badge bg-success"><i class="bi bi-check2-all"></i> Approve</span>
                         <span id="unapproveBtn" role="button" class="badge bg-danger"><i class="bi bi-x-octagon"></i> Unapprove</span>
                     </div>
@@ -80,7 +80,6 @@
                                 <th>Team</th>
                                 <th>Appr. Status</th>
                                 <th>Score Status</th>
-                                <th>Memo</th>
                                 <th>Action</th>
                             </tr>
                         </thead>

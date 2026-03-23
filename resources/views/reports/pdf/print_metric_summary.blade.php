@@ -106,7 +106,7 @@
                             <td>{{ $metric->team_total }}</td>
                             <td>{{ $metric->guest_total }}</td>
                             <td><b>{{ $attendTotal }}</b></td>
-                            <td>{{ $metric->memo }}</td>
+                            <td>{!! $metric->memo !!}</td>
                         </tr>
                     @endforeach
                 </tbody>
@@ -129,7 +129,7 @@
                             <td><b>{{ @$metric->team->name }}</b></td>
                             <td>{{ dateFormat($metric->date) }}</td>
                             <td>{{ numberFormat($metric->grant_amount) }}</td>
-                            <td>{{ $metric->memo }}</td>
+                            <td>{!! $metric->memo !!}</td>
                         </tr>
                     @endforeach
                 </tbody>
@@ -181,7 +181,7 @@
                             <td><b>{{ @$metric->team->name }}</b></td>
                             <td>{{ dateFormat($metric->date) }}</td>
                             <td>{{ $attendance }}</td>
-                            <td>{{ $metric->memo }}</td>
+                            <td>{!! $metric->memo !!}</td>
                         </tr>
                     @endforeach
                 </tbody>
@@ -206,7 +206,7 @@
                             <td>{{ dateFormat($metric->date) }}</td>
                             <td>{{ $metric->team_mission_total }}</td>
                             <td>{{ numberFormat($metric->team_mission_amount) }}</td>
-                            <td>{{ $metric->memo }}</td>
+                            <td>{!! $metric->memo !!}</td>
                         </tr>
                     @endforeach
                 </tbody>
