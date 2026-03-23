@@ -79,7 +79,7 @@
                               style="height:30px;width:110px;">
                         <option value="${escapeHtml(m.id)}-local"    ${m.cat === 'local' ? 'selected' : ''}>Local</option>
                         <option value="${escapeHtml(m.id)}-diaspora" ${m.cat === 'diaspora' ? 'selected' : ''}>Diaspora</option>
-                        <option value="${escapeHtml(m.id)}-dormant"  ${m.cat === 'dormant' ? 'selected' : ''}>Dormant</option>
+                        <option value="${escapeHtml(m.id)}-new"  ${m.cat === 'new' ? 'selected' : ''}>New</option>
                       </select>
                     </div>
                   </label>
@@ -98,7 +98,7 @@
     // ========= recalc counts based on checked members =========
     function recalcMonth($monthRow) {
         const $confirmRow = getConfirmRow($monthRow);
-        let local = 0, diaspora = 0, dormant = 0, confirmed = 0;
+        let local = 0, diaspora = 0, newc = 0, confirmed = 0;
 
         $confirmRow.find('select.member-category').each(function(){
             const $wrap = $(this).closest('.form-check'); // no tag restriction
@@ -110,18 +110,18 @@
                 const cat = $(this).val();
                 if (cat.includes('local')) local++;
                 if (cat.includes('diaspora')) diaspora++;
-                if (cat.includes('dormant')) dormant++;
+                if (cat.includes('new')) newc++;
             }
         });    
 
         $monthRow.find('.local-size').val(local);
         $monthRow.find('.diaspora-size').val(diaspora);
-        $monthRow.find('.dormant-size').val(dormant);           
+        $monthRow.find('.new-size').val(newc);           
 
         $monthRow.find('.sum-confirmed').text(confirmed);
         $monthRow.find('.sum-local').text(local);
         $monthRow.find('.sum-diaspora').text(diaspora);
-        $monthRow.find('.sum-dormant').text(dormant);
+        $monthRow.find('.sum-new').text(newc);
     }
 
     // ========= MASTER: add/remove =========
@@ -221,7 +221,7 @@
         let cat = '';
         if ($(this).val().includes('local')) cat = 'local';
         if ($(this).val().includes('diaspora')) cat = 'diaspora';
-        if ($(this).val().includes('dormant')) cat = 'dormant';
+        if ($(this).val().includes('new')) cat = 'new';
         $checkbox.attr('data-cat', cat);
     });
 

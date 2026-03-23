@@ -45,9 +45,9 @@
                   <tr>
                       <th>Team Name</th>
                       <th>As Of Date</th>
-                      <th>Local Size</th>
-                      <th>Diaspora Size</th>
-                      <th>Dormant Size</th>
+                      <th>Local</th>
+                      <th>Diaspora</th>
+                      <th>New</th>
                       <th>Verified</th>
                       <th>Note</th>
                   </tr>
@@ -57,8 +57,8 @@
                     <td class="name" width="20%"></td>
                     <td class="date" width="15%"></td>
                     <td class="local-size"></td>
-                    <td class="diasp-size"></td>
-                    <td class="dorm-size"></td>
+                    <td class="diaspora-size"></td>
+                    <td class="new-size"></td>
                     <td class="d-flex justify-content-center align-items-center">
                       <input type="checkbox" class="form-check-input verified-check">
                       <input type="hidden" name="verified[]" class="verified">

@@ -1,25 +1,27 @@
 {{-- ======== BASIC TEAM DETAILS ========= --}}
-<div class="row mb-3">
-    <label for="is_active" class="col-md-2">Is Active</label>
-    <div class="col-md-8 col-12">
-        {{ Form::checkbox('is_active', isset($team->is_active)? $team->is_active : 1, true, ['id' => 'is_active']) }}
-    </div>
-</div>
-<div class="row mb-3">
-    <label for="name" class="col-md-2">Team Name</label>
-    <div class="col-md-8 col-12">
-        {{ Form::text('name', null, ['class' => 'form-control', 'required' => 'required']) }}
+<div class="row mb-4">
+    <label for="name" class="col-md-1">Team Name</label>
+    <div class="col-md-4 col-12">
+        {{ Form::text('name', null, ['class' => 'form-control', 'required' => 'required', 'readonly' => 'readonly']) }}
+        <div class="form-check mt-1">
+            {{ Form::checkbox('is_active', isset($team->is_active)? $team->is_active : 1, true, ['class' => 'form-check-input', 'id' => 'is_active']) }} 
+            <label class="form-check-label" for="flexCheckDefault">Is Active</label>
+          {{-- <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+          <label class="form-check-label" for="flexCheckDefault">
+            Default checkbox
+          </label> --}}
+        </div>
     </div>
 </div>
 
-<div class="mt-2 mb-3" style="width:85%; margin-left:auto; margin-right:auto">
+<div class="mt-3 mb-3" style="width:85%; margin-left:auto; margin-right:auto">
     {{-- ========= MASTER TABLE ========= --}}
     <div class="d-flex justify-content-between align-items-center mb-2">
         @php $memberCount = ($team->members ?? collect())->count() @endphp
         <h6 class="mb-0"><i class="bi bi-people"></i> Master Member Register {{ $memberCount? "({$memberCount})" : "" }}</h6>
-        <button type="button" class="btn btn-sm btn-outline-success" id="addMasterMember">
+        {{-- <button type="button" class="btn btn-sm btn-outline-success" id="addMasterMember">
             <i class="bi bi-person-plus"></i> Add Member
-        </button>
+        </button> --}}
     </div>
 
     <div class="table-responsive mb-4" style="max-height: 50vh; overflow-y: auto; border: 1px solid #ddd;">
@@ -31,7 +33,7 @@
                     <th>DF Name</th>
                     <th>Phone No.</th>
                     <th>Physical Addr.</th>
-                    <th>Action</th>
+                    <th class="d-none">Action</th>
                 </tr>
             </thead>
             <tbody>
@@ -46,7 +48,7 @@
                             name="category[]" 
                             class="form-select form-select-sm master-category"
                         >
-                            @foreach (['local', 'diaspora', 'dormant'] as $value)
+                            @foreach (['local', 'diaspora', 'new'] as $value)
                                 <option value="{{ $value }}">{{ ucfirst($value) }}</option>
                             @endforeach
                         </select>
@@ -69,39 +71,40 @@
                 @foreach (($team->members ?? collect())->sortByDesc('id') as $key => $row)
                     <tr>
                         <td>
-                            <input type="text" name="full_name[]" value="{{ $row->full_name }}" class="form-control form-control-sm master-name" placeholder="e.g. John Doe">
+                            <input type="text" name="full_name[]" value="{{ $row->full_name }}" class="form-control form-control-sm master-name" placeholder="e.g. John Doe" readonly>
                             <input type="hidden"  class="master-id" name="master_id[]" value="{{ $row->id }}">
                         </td>
                         <td>
-                            @if ($row->is_category_member_verified)
+                            {{-- @if ($row->is_category_member_verified) --}}
+                            @if (true)
                                 <select 
                                     name="category[]" 
                                     class="form-select form-select-sm master-category"
                                     style="pointer-events: none; background-color: #e9ecef;" 
                                     readonly
                                 >
-                                    @foreach (['local', 'diaspora', 'dormant'] as $value)
+                                    @foreach (['local', 'diaspora', 'new'] as $value)
                                         <option value="{{ $value }}" {{ $value === $row->category? 'selected' : '' }}>{{ ucfirst($value) }}</option>
                                     @endforeach
                                 </select>
                             @else
                                 <select name="category[]" class="form-select form-select-sm master-category">                                
-                                    @foreach (['local', 'diaspora', 'dormant'] as $value)
+                                    @foreach (['local', 'diaspora', 'new'] as $value)
                                         <option value="{{ $value }}" {{ $value === $row->category? 'selected' : '' }}>{{ ucfirst($value) }}</option>
                                     @endforeach
                                 </select>
                             @endif
                         </td>
                         <td>
-                            <input type="text" name="df_name[]" value="{{ $row->df_name }}" class="form-control form-control-sm master-dfname">
+                            <input type="text" name="df_name[]" value="{{ $row->df_name }}" class="form-control form-control-sm master-dfname" readonly>
                         </td>
                         <td>
-                            <input type="text" name="phone_no[]" value="{{ $row->phone_no }}" class="form-control form-control-sm master-phone">
+                            <input type="text" name="phone_no[]" value="{{ $row->phone_no }}" class="form-control form-control-sm master-phone" readonly>
                         </td>
                         <td>
-                            <input type="text" name="physical_addr[]" value="{{ $row->physical_addr }}" class="form-control form-control-sm master-addr">
+                            <input type="text" name="physical_addr[]" value="{{ $row->physical_addr }}" class="form-control form-control-sm master-addr" readonly>
                         </td>
-                        <td class="text-center">
+                        <td class="text-center d-none">
                             <button type="button" class="btn btn-sm btn-outline-danger del-master" {{ $row->is_category_member_verified? 'disabled' : '' }}>
                                 <i class="bi bi-trash"></i>
                             </button>
@@ -129,7 +132,7 @@
                         <th>Beginning Date</th>
                         <th width="20%">Local Size</th>
                         <th width="20%">Diaspora Size</th>
-                        <th width="20%">Dormant Size</th>
+                        <th width="20%">New Size</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -148,13 +151,13 @@
                                         Confirmed: <span class="sum-confirmed">0</span> |
                                         Local: <span class="sum-local">{{ (int) $row->local_size }}</span> |
                                         Diaspora: <span class="sum-diaspora">{{ (int) $row->diaspora_size }}</span> |
-                                        Dormant: <span class="sum-dormant">{{ (int) $row->dormant_size }}</span>
+                                        New: <span class="sum-new">{{ (int) $row->new_size }}</span>
                                     </span>
                                 </div>
                             </td>
                             <td><input type="number" name="local_size[]" value="{{ $row->local_size }}" data-value="{{$row->local_size}}" class="form-control local-size"></td>
                             <td><input type="number" name="diaspora_size[]" value="{{ $row->diaspora_size }}" data-value="{{$row->diaspora_size}}" class="form-control diaspora-size"></td>
-                            <td><input type="number" name="dormant_size[]" value="{{ $row->dormant_size }}" data-value="{{$row->dormant_size}}" class="form-control dormant-size"></td>
+                            <td><input type="number" name="new_size[]" value="{{ $row->new_size }}" data-value="{{$row->new_size}}" class="form-control new-size"></td>
                             <td class="text-center">                                
                                 <button type="button" class="btn btn-sm btn-outline-danger del-month-row" {{ !$row->is_editable? 'disabled' : '' }}><i class="bi bi-trash"></i></button>
                             </td>
@@ -202,13 +205,13 @@
                                     Confirmed: <span class="sum-confirmed">0</span> |
                                     Local: <span class="sum-local">0</span> |
                                     Diaspora: <span class="sum-diaspora">0</span> |
-                                    Dormant: <span class="sum-dormant">0</span>
+                                    New: <span class="sum-new">0</span>
                                 </span>
                             </div>                                
                         </td>
                         <td><input type="number" name="local_size[]" value="0" class="form-control local-size"></td>
                         <td><input type="number" name="diaspora_size[]" value="0" class="form-control diaspora-size"></td>
-                        <td><input type="number" name="dormant_size[]" value="0" class="form-control dormant-size"></td>
+                        <td><input type="number" name="new_size[]" value="0" class="form-control new-size"></td>
                         <td class="text-center">
                             <button type="button" class="btn btn-sm btn-outline-danger del-month-row"><i class="bi bi-trash"></i></button>
                         </td>

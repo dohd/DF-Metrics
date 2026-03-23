@@ -6,7 +6,7 @@
     <div class="card">
         <div class="card-body">
             <div class="card-content p-2">
-                <div class="mb-2">
+                <div class="m-2">
                     @if (auth()->user()->user_type === 'chair')
                     @endif
                     <span class="badge bg-primary" data-bs-toggle="modal" data-bs-target="#verifxnModal" style="cursor: pointer;">
@@ -22,7 +22,7 @@
                             <th>Team Label</th>
                             <th>Local Size</th>
                             <th>Diasp. Size</th>
-                            <th>Dorm. Size</th>
+                            <th>New Size</th>
                             <th>Status</th>
                             <th>Updated At</th>
                             <th>Action</th>
@@ -37,7 +37,7 @@
                                     <td>{{ $team->name }}</td>
                                     <td>{{ $teamSize->local_size }}</td>
                                     <td>{{ $teamSize->diaspora_size }}</td>
-                                    <td>{{ $teamSize->dormant_size }}</td>
+                                    <td>{{ $teamSize->new_size }}</td>
                                     <td>
                                         <span class="badge bg-{{ $teamSize->verified? 'success' : 'secondary' }}">
                                             {{ $teamSize->verified? 'Verified' : 'Unverified' }}
@@ -63,10 +63,8 @@
 
         init() {
             $('.temp-row').remove();
-
             $('#month, #year').change(Index.onChangePeriod);
             $('#month').change();
-            
             $('#teamSizeTbl').on('change', '.verified-check', Index.onChangeVerified);
         },
 
@@ -85,8 +83,8 @@
                         row.find('.name').html(team.name);
                         row.find('.date').html(date.split('-').reverse().join('-'));
                         row.find('.local-size').html(teamSize.local_size);
-                        row.find('.diasp-size').html(teamSize.diaspora_size);
-                        row.find('.dorm-size').html(teamSize.dormant_size);
+                        row.find('.diaspora-size').html(teamSize.diaspora_size);
+                        row.find('.new-size').html(teamSize.new_size);
                         row.find('.verified').val(teamSize.verified? 1 : '');
                         row.find('.verified-check').attr('checked', teamSize.verified? true : false);
                         row.find('.note').html(teamSize.verified_note);

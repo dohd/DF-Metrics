@@ -51,18 +51,16 @@ class TeamController extends Controller
     {
         $request->validate([
             'name' => 'required',
-            // member details
-            'full_name' => ['required', 'array', 'min:1'],
-            'category' => ['required', 'array', 'min:1'],           
+            'full_name' => 'required|array|min:1',
+            'category' => 'required|array|min:1',          
         ]);
 
-        $basicDetails = $request->only('is_active', 'name', 'max_guest');
+        $basicDetails = $request->only('is_active', 'name');
         $memberDetails = $request->only('full_name', 'category', 'df_name', 'phone_no', 'physical_addr');
 
         try {    
             DB::beginTransaction();
 
-            // $basicDetails['max_guest'] = numberClean($basicDetails['max_guest']);
             $team = Team::create($basicDetails);
 
             $n = count($memberDetails['full_name']);
@@ -119,29 +117,30 @@ class TeamController extends Controller
             // 'category' => ['required', 'array', 'min:1'],          
         ]);
         
-        $basicDetails = $request->only('is_active', 'name', 'max_guest');
+        $basicDetails = $request->only('is_active', 'name');
         $memberDetails = $request->only('master_id', 'full_name', 'category', 'df_name', 'phone_no', 'physical_addr');
-        $confirmationDetails = $request->only('team_size_id', 'start_date', 'local_size', 'diaspora_size', 'dormant_size');
-        $memberCategories = []; // pair member_id -> category
-        $checkedRowIds = [];
-        foreach ($request->all() as $key => $value) {
-            if (preg_match('/^checked_\d+$/', $key)) {
-                $checkedRowIds[] = $value;
-            }
-            if (preg_match('/^membercat_\d+$/', $key)) {
-                $value1 = [];
-                foreach ($value as $i => $cat) {
-                    $pair = explode('-', $cat);
-                    $value1[$pair[0]] = $pair[1];
-                }
-                $memberCategories[] = $value1;
-            }
-        }
+        $confirmationDetails = $request->only('team_size_id', 'start_date', 'local_size', 'diaspora_size', 'new_size');
 
         try {   
+            $memberCategories = []; // pair member_id -> category
+            $checkedRowIds = [];
+            foreach ($request->all() as $key => $value) {
+                if (preg_match('/^checked_\d+$/', $key)) {
+                    $checkedRowIds[] = $value;
+                }
+                if (preg_match('/^membercat_\d+$/', $key)) {
+                    $value1 = [];
+                    foreach ($value as $i => $cat) {
+                        $pair = explode('-', $cat);
+                        $value1[$pair[0]] = $pair[1];
+                    }
+                    $memberCategories[] = $value1;
+                }
+            }
+
             DB::beginTransaction();
 
-            // $basicDetails['max_guest'] = numberClean($basicDetails['max_guest']);
+            // update basic details
             $basicDetails['is_active'] = $basicDetails['is_active'] ?? null; 
             $team->update($basicDetails);
 
@@ -156,15 +155,13 @@ class TeamController extends Controller
                 }
             }
 
-            $team->load(['members', 'team_sizes', 'verify_members']);
-            $verifiedDates = $team->team_sizes
-                ->whereNotNull('verified')
-                ->pluck('start_period');
-
             // manage team size and member verification
+            $team->load(['members', 'team_sizes', 'verify_members']);
+            $verifiedDates = $team->team_sizes->whereNotNull('verified')->pluck('start_period');
             $verifyMembersData = [];
             $teamSizesData = [];
             $startDates = $confirmationDetails['start_date'] ?? [];
+
             foreach($startDates as $key => $date) {
                 $date = databaseDate($date);
                 $month = Carbon::parse($date)->month;
@@ -193,7 +190,7 @@ class TeamController extends Controller
                 // update team size for the month
                 $localSize = $confirmationDetails['local_size'][$key] ?? 0;
                 $diasporaSize = $confirmationDetails['diaspora_size'][$key] ?? 0;
-                $dormantSize = $confirmationDetails['dormant_size'][$key] ?? 0;
+                $newSize = $confirmationDetails['new_size'][$key] ?? 0;
                 $verifiedMemberCount = $team->verify_members()
                     ->whereMonth('date', $month)
                     ->whereYear('date', $year)
@@ -203,7 +200,7 @@ class TeamController extends Controller
                 if ($verifiedMemberCount->count()) {
                     $localSize = $verifiedMemberCount['local'] ?? 0;
                     $diasporaSize = $verifiedMemberCount['diaspora'] ?? 0;
-                    $dormantSize = $verifiedMemberCount['dormant'] ?? 0;                    
+                    $newSize = $verifiedMemberCount['new'] ?? 0;                    
                 }
                 
                 // delete non-verified records
@@ -216,20 +213,20 @@ class TeamController extends Controller
                         'start_period' => $date,
                         'local_size' => numberClean($localSize),
                         'diaspora_size' => numberClean($diasporaSize),
-                        'dormant_size' => numberClean($dormantSize),
+                        'new_size' => numberClean($newSize),
                     ];                  
                 }
             }
 
-            foreach ($verifyMembersData as $key => $value) {
+            // create verified members and team sizes
+            foreach ($verifyMembersData as $value) {
                 $team->verify_members()->create($value);
             }
-            foreach ($teamSizesData as $key => $value) {
+            foreach ($teamSizesData as $value) {
                 $team->team_sizes()->create($value);
             }
 
             DB::commit();
-
             return redirect(route('teams.index'))->with(['success' => 'Team updated successfully']);
         } catch (\Throwable $th) {
             return errorHandler('Error updating Team!', $th);
@@ -305,7 +302,6 @@ class TeamController extends Controller
             }
 
             DB::commit();
-
             return redirect(route('teams.index'))->with(['success' => 'Team verification successfully']);
         } catch (Exception $e) {
             return errorHandler('Error verifying teams', $e);
