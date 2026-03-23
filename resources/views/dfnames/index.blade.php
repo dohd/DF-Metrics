@@ -11,19 +11,23 @@
                     <table class="table table-borderless datatable">
                         <thead>
                           <tr>
-                            <th scope="col">#No</th>
-                            <th scope="col">DF Name</th>
-                            <th scope="col">DF Zone</th>
-                            <th scope="col">Action</th>
+                            <th>#No</th>
+                            <th>DF Name</th>
+                            <th>DF Zone</th>
+                            <th>Leader</th>
+                            <th>Asst. leader</th>
+                            <th>Action</th>
                           </tr>
                         </thead>
                         <tbody>
-                            @foreach ($dfnames as $i => $cohort)
+                            @foreach ($dfnames as $i => $row)
                                 <tr>
-                                    <th scope="row">{{ $i+1 }}</th>
-                                    <td>{{ $cohort->name }}</td>
-                                    <td>{{ @$cohort->dfzone->name }}</td>
-                                    <td>{!! $cohort->action_buttons !!}</td>
+                                    <td class="fw-bold">{{ $i+1 }}</td>
+                                    <td>{{ $row->name }}</td>
+                                    <td>{{ @$row->dfzone->name }}</td>
+                                    <td>{{ $row->leader }}</td>
+                                    <td>{{ $row->assistant_leader }}</td>
+                                    <td>{!! $row->action_buttons !!}</td>
                                 </tr>
                             @endforeach
                         </tbody>

@@ -17,7 +17,6 @@ class DFZonesController extends Controller
     public function index()
     {
         $dfzones = DFZone::latest()->get();
-
         return view('dfzones.index', compact('dfzones'));
     }
 
@@ -28,8 +27,7 @@ class DFZonesController extends Controller
      */
     public function create()
     {
-        $zones = collect();
-        return view('dfzones.create', compact('zones'));
+        return view('dfzones.create');
     }
 
     /**
@@ -41,7 +39,7 @@ class DFZonesController extends Controller
     public function store(Request $request)
     {
         $request->validate(['name' => 'required']);
-        $data = $request->only(['name']);
+        $data = $request->except('_token');
 
         try {            
             DFZone::create($data);
@@ -59,20 +57,7 @@ class DFZonesController extends Controller
      */
     public function show(DFZone $dfzone)
     {
-        $proposal_items = ProposalItem::whereHas('participant_lists', function ($q) use($dfzone) {
-            $q->where('region_id', $dfzone->id)->where('total_count', '>', 0);
-        })
-        ->with(['participant_lists' => fn($q) => $q->where('region_id', $dfzone->id)->where('total_count', '>', 0)])
-        ->with('participant_regions')
-        ->get();
-        // append regions and dates 
-        foreach ($proposal_items as $item) {
-            $item->regions = $item->participant_regions->pluck('name')->toArray();
-            $item->dates = $item->participant_lists->pluck('date')->toArray();
-            $item->dates = array_map(fn($v) => dateFormat($v), $item->dates);
-        }
-
-        return view('dfzones.view', compact('dfzone', 'proposal_items'));
+        return view('dfzones.view', compact('dfzone'));
     }
 
     /**
@@ -83,7 +68,6 @@ class DFZonesController extends Controller
      */
     public function edit(DFZone $dfzone)
     {
-        $zones = collect();
         return view('dfzones.edit', compact('dfzone'));
     }
 
@@ -97,7 +81,7 @@ class DFZonesController extends Controller
     public function update(Request $request, DFZone $dfzone)
     {
         $request->validate(['name' => 'required']);
-        $data = $request->only(['name']);
+        $data = $request->except('_token');
 
         try {            
             $dfzone->update($data);

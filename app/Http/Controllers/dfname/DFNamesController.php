@@ -42,7 +42,7 @@ class DFNamesController extends Controller
     public function store(Request $request)
     {
         $request->validate(['name' => 'required']);
-        $data = $request->only(['name', 'dfzone_id']);
+        $data = $request->except('_token');
 
         try {            
             DFName::create($data);
@@ -98,7 +98,7 @@ class DFNamesController extends Controller
     public function update(Request $request, DFName $dfname)
     {
         $request->validate(['name' => 'required']);
-        $data = $request->only(['name', 'dfzone_id']);
+        $data = $request->except('_token');
 
         try {            
             $dfname->update($data);
