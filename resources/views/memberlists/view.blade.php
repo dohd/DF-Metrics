@@ -32,7 +32,8 @@
                                 <th>Residence</th>
                                 <th>Phone No.</th>
                                 <th>Gender</th>
-                                <th>Age Group</th>                                
+                                <th>Age Group</th>  
+                                <th>Member Category</th>                               
                                 <th>Ministry</th>
                                 <th>Department</th>
                             </tr>
@@ -46,6 +47,7 @@
                                     <td>{{ $item->phone_no }}</td>
                                     <td>{{ $item->gender }}</td>
                                     <td>{{ @$item->age_group->bracket }}</td>
+                                    <td>{{ ucfirst($item->category) }}</td>
                                     <td>{{ @$item->ministry->name }}</td>
                                     <td>{{ @$item->department->name }}</td>                          
                                 </tr>

@@ -87,6 +87,7 @@ class MemberListsController extends Controller
                     'df_name' => $memberlist->dfname->name,
                     'phone_no' => $item->phone_no,
                     'physical_addr' => $item->residence,
+                    'category' => $item->category,
                 ]);
             }
 
@@ -174,6 +175,7 @@ class MemberListsController extends Controller
                         'df_name' => $memberlist->dfname->name,
                         'phone_no' => $item->phone_no,
                         'physical_addr' => $item->residence,
+                        'category' => $item->category,
                     ]);
                 }                
             } else {
@@ -185,6 +187,7 @@ class MemberListsController extends Controller
                         'df_name' => $memberlist->dfname->name,
                         'phone_no' => $item->phone_no,
                         'physical_addr' => $item->residence,
+                        'category' => $item->category,
                     ]);                                        
                 }
             }
