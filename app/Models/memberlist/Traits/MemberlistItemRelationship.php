@@ -4,10 +4,16 @@ namespace App\Models\memberlist\Traits;
 
 use App\Models\age_group\AgeGroup;
 use App\Models\department\Department;
+use App\Models\memberlist\MemberMinistry;
 use App\Models\ministry\Ministry;
 
 trait MemberlistItemRelationship
 {
+    public function memberMinistries()
+    {
+        return $this->hasMany(MemberMinistry::class);
+    }
+
     public function ministry()
     {
     	return $this->belongsTo(Ministry::class);

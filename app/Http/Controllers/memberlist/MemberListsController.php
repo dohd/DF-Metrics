@@ -68,10 +68,23 @@ class MemberListsController extends Controller
             $input = inputClean($input); 
             $memberlist = Memberlist::create($input); 
 
-            // create memberlist items
+            // memberlist items
             foreach ($inputItems as $value) {
                 unset($value['memberlist_item_id']);
-               $memberlist->items()->create($value);
+                // unpack ministries
+                $ministryIds = $value['ministry_id'];
+                if ($ministryIds) $value['ministry_id'] = $value['ministry_id'][0];
+
+                // create memberlist item
+                $memberlistItem = $memberlist->items()->create($value);
+                
+                // create member ministries
+                foreach ($ministryIds as $id) {
+                    $memberlistItem->memberMinistries()->create([
+                        'memberlist_id' => $memberlist->id,
+                        'ministry_id' => $id,
+                    ]);
+                }
             }
 
             // create team
@@ -117,6 +130,7 @@ class MemberListsController extends Controller
      */
     public function edit(Memberlist $memberlist)
     {
+        $memberlist->load('memberMinistries');
         $dfnames = DFName::latest()->get(['id', 'name']);
         $ministries = Ministry::latest()->get(['id', 'name']);
         $departments = Department::latest()->get(['id', 'name']);
@@ -145,7 +159,7 @@ class MemberListsController extends Controller
 
         $input = $request->only('date', 'dfname_id');
         $inputItems = $request->memberlist_items;
-       
+
         try {
             DB::beginTransaction();
 
@@ -153,12 +167,29 @@ class MemberListsController extends Controller
             $input = inputClean($input); 
             $memberlist->update($input); 
 
-            // create memberlist items
+            // memberlist items
             foreach ($inputItems as $value) {
                 $id = $value['memberlist_item_id'];
                 unset($value['memberlist_item_id']);
-                if (empty($id)) $memberlist->items()->create($value);
-                else $memberlist->items()->where('id', $id)->update($value); 
+                // unpack ministries
+                $ministryIds = $value['ministry_id'];
+                if ($ministryIds) $value['ministry_id'] = $value['ministry_id'][0];
+
+                // create or update meberlist item
+                $memberlistItem = $memberlist->items()->where('id', $id)->first();
+                if ($memberlistItem) $memberlistItem->update($value); 
+                else {
+                    $memberlistItem = $memberlist->items()->create($value);
+                }
+
+                // create member ministries
+                $memberlistItem->memberMinistries()->delete();
+                foreach ($ministryIds as $id) {
+                    $memberlistItem->memberMinistries()->create([
+                        'memberlist_id' => $memberlist->id,
+                        'ministry_id' => $id,
+                    ]);
+                }
             }
 
             // create team if none exists
