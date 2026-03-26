@@ -44,6 +44,12 @@
             {{ Form::number('guest_total', null, ['class' => 'form-control', 'id' => 'guest_total', 'placeholder' => 'No. of guest members', 'autocomplete' => 'false']) }}
         </div>
     </div>
+    <div class="row mb-3">
+        <label for="amount" class="col-md-2">Collected Amount</label>
+        <div class="col-md-8 col-12">
+            {{ Form::text('collected_amount', null, ['id' => 'collected_amount', 'class' => 'form-control', 'placeholder' => '0.00', 'autocomplete' => 'false']) }}
+        </div>
+    </div>
 </div>
 <!-- finance metric -->
 <div class="metric d-none" key="Finance">

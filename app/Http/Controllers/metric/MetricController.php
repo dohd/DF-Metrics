@@ -82,21 +82,24 @@ class MetricController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'date' => ['required', 'date'],
-            'programme_id' => ['required', 'integer', 'exists:programmes,id'],
-            'team_id' => ['required', 'integer', 'exists:teams,id'],
+            'date' => 'required|date',
+            'programme_id' => 'required|integer|exists:programmes,id',
+            'team_id' => 'required|integer|exists:teams,id',
 
-            'grant_amount' => ['nullable', 'regex:/^\d+(,\d+)*$/'],
-            'team_total' => ['nullable', 'numeric', 'min:0'],
-            'retreat_leader_total' => ['nullable', 'numeric', 'min:0'],
-            'online_meeting_team_total' => ['nullable', 'numeric', 'min:0'],
-            'activities_total' => ['nullable', 'numeric', 'min:0'],
-            'summit_leader_total' => ['nullable', 'numeric', 'min:0'],
-            'recruit_total' => ['nullable', 'numeric', 'min:0'],
-            'initiative_total' => ['nullable', 'numeric', 'min:0'],
-            'team_mission_total' => ['nullable', 'numeric', 'min:0'],
-            'choir_member_total' => ['nullable', 'numeric', 'min:0'],
-            'other_activities_total' => ['nullable', 'numeric', 'min:0'],
+            'grant_amount' => ['nullable', 'regex:/^(\d+|\d{1,3}(,\d{3})*)(\.\d{2})?$/'],
+            'team_mission_amount' => ['nullable', 'regex:/^(\d+|\d{1,3}(,\d{3})*)(\.\d{2})?$/'],
+            'collected_amount' => ['nullable', 'regex:/^(\d+|\d{1,3}(,\d{3})*)(\.\d{2})?$/'],
+
+            'team_total' => 'nullable|numeric|min:0',
+            'retreat_leader_total' => 'nullable|numeric|min:0',
+            'online_meeting_team_total' => 'nullable|numeric|min:0',
+            'activities_total' => 'nullable|numeric|min:0',
+            'summit_leader_total' => 'nullable|numeric|min:0',
+            'recruit_total' => 'nullable|numeric|min:0',
+            'initiative_total' => 'nullable|numeric|min:0',
+            'team_mission_total' => 'nullable|numeric|min:0',
+            'choir_member_total' => 'nullable|numeric|min:0',
+            'other_activities_total' => 'nullable|numeric|min:0',
         ]);
 
        
@@ -108,10 +111,9 @@ class MetricController extends Controller
                 $keys = [
                     'team_total', 'guest_total', 'grant_amount', 'retreat_leader_total', 'online_meeting_team_total', 'activities_total', 'summit_leader_total',
                     'recruit_total', 'initiative_total', 'team_mission_total', 'choir_member_total', 'other_activities_total', 'team_mission_amount',
+                    'collected_amount',
                 ];
-                if (in_array($key, $keys)) {
-                    $input[$key] = numberClean($value);
-                }
+                if (in_array($key, $keys)) $input[$key] = numberClean($value);
             }
 
             // duplicate entry
@@ -201,37 +203,40 @@ class MetricController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, Metric $metric)
-    { 
+    {
         $request->validate([
-            'date' => ['required', 'date'],
-            'programme_id' => ['required', 'integer', 'exists:programmes,id'],
-            'team_id' => ['required', 'integer', 'exists:teams,id'],
+            'date' => 'required|date',
+            'programme_id' => 'required|integer|exists:programmes,id',
+            'team_id' => 'required|integer|exists:teams,id',
 
-            'grant_amount' => ['nullable', 'regex:/^\d+(,\d+)*$/'],
-            'team_total' => ['nullable', 'numeric', 'min:0'],
-            'retreat_leader_total' => ['nullable', 'numeric', 'min:0'],
-            'online_meeting_team_total' => ['nullable', 'numeric', 'min:0'],
-            'activities_total' => ['nullable', 'numeric', 'min:0'],
-            'summit_leader_total' => ['nullable', 'numeric', 'min:0'],
-            'recruit_total' => ['nullable', 'numeric', 'min:0'],
-            'initiative_total' => ['nullable', 'numeric', 'min:0'],
-            'team_mission_total' => ['nullable', 'numeric', 'min:0'],
-            'choir_member_total' => ['nullable', 'numeric', 'min:0'],
-            'other_activities_total' => ['nullable', 'numeric', 'min:0'],
+            'grant_amount' => ['nullable', 'regex:/^(\d+|\d{1,3}(,\d{3})*)(\.\d{2})?$/'],
+            'team_mission_amount' => ['nullable', 'regex:/^(\d+|\d{1,3}(,\d{3})*)(\.\d{2})?$/'],
+            'collected_amount' => ['nullable', 'regex:/^(\d+|\d{1,3}(,\d{3})*)(\.\d{2})?$/'],
+
+            'team_total' => 'nullable|numeric|min:0',
+            'retreat_leader_total' => 'nullable|numeric|min:0',
+            'online_meeting_team_total' => 'nullable|numeric|min:0',
+            'activities_total' => 'nullable|numeric|min:0',
+            'summit_leader_total' => 'nullable|numeric|min:0',
+            'recruit_total' => 'nullable|numeric|min:0',
+            'initiative_total' => 'nullable|numeric|min:0',
+            'team_mission_total' => 'nullable|numeric|min:0',
+            'choir_member_total' => 'nullable|numeric|min:0',
+            'other_activities_total' => 'nullable|numeric|min:0',
         ]);
 
+        $teamMembersData = $request->only('team_member_id');
+        $input = inputClean($request->except('_token'));
+
         try {     
-            $teamMembersData = $request->only('team_member_id');
-            $input = inputClean($request->except('_token'));
             unset($input['team_member_id']);
             foreach ($input as $key => $value) {
                 $keys = [
                     'team_total', 'guest_total', 'grant_amount', 'retreat_leader_total', 'online_meeting_team_total', 'activities_total', 'summit_leader_total',
                     'recruit_total', 'initiative_total', 'team_mission_total', 'choir_member_total', 'other_activities_total', 'team_mission_amount',
+                    'collected_amount',
                 ];
-                if (in_array($key, $keys)) {
-                    $input[$key] = numberClean($value);
-                }
+                if (in_array($key, $keys)) $input[$key] = numberClean($value);
             }
 
             // duplicate entry
