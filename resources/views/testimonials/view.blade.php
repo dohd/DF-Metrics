@@ -8,7 +8,7 @@
             <h6 class="card-title">Testimonials</h6>
             <div class="card-content p-2">
                 <p>Date: <b>{{ dateFormat($testimonial->date, 'd-M-Y') }}</b></p>
-                <h4 class="text-center text-primary mt-2 mb-2 fw-bold">{{ $testimonial->title }}</h4>
+                <h3 class="text-center text-primary mt-2 mb-2 fw-bold">{{ $testimonial->title }}</h3>
                 <div class="mb-3">
                     <h5><u>Situation (Before intervention)</u></h5>
                     <div>{!! @$testimonial->situation !!}</div>
@@ -35,10 +35,10 @@
                                 <img src="{{ route('storage.file_render', 'images,testimonials,' . $images[0]) }}" alt="image1" style="width: 100%; height: 100%; border-radius: 8px;">
                             </div>
                             <div>
-                                {{ $testimonial->caption1 }}
-                                <span class="float-end del" style="cursor: pointer;" name="image1">
+                                <span class="del" style="cursor: pointer;" name="image1">
                                     <i class="bi bi-trash text-danger icon-xs"></i>
                                 </span>
+                                {{ $testimonial->caption1 }}
                             </div>
                         </div>
                     @endif
@@ -48,10 +48,10 @@
                                 <img src="{{ route('storage.file_render', 'images,testimonials,' . $images[1]) }}" alt="image1" style="width: 100%; height: 100%; border-radius: 8px;">
                             </div>
                             <div>
-                                {{ $testimonial->caption2 }}
-                                <span class="float-end del" style="cursor: pointer;" name="image2">
+                                <span class="del" style="cursor: pointer;" name="image2">
                                     <i class="bi bi-trash text-danger icon-xs"></i>
                                 </span>
+                                {{ $testimonial->caption2 }}
                             </div>
                         </div>
                     @endif
@@ -61,10 +61,10 @@
                                 <img src="{{ route('storage.file_render', 'images,testimonials,' . $images[2]) }}" alt="image1" style="width: 100%; height: 100%; border-radius: 8px;">
                             </div>
                             <div>
-                                {{ $testimonial->caption3 }}
-                                <span class="float-end del" style="cursor: pointer;" name="image3">
+                                <span class="del" style="cursor: pointer;" name="image3">
                                     <i class="bi bi-trash text-danger icon-xs"></i>
                                 </span>
+                                {{ $testimonial->caption3 }}
                             </div>
                         </div>
                     @endif

@@ -66,17 +66,13 @@ Route::group(['middleware' => 'auth'], function() {
     // member lists
     Route::post('memberlists/delete_file', [MemberListsController::class, 'delete_file'])->name('attendances.delete_file');
     Route::resource('memberlists', MemberListsController::class);
-    // narratives
-    // Route::post('narratives/delete_file', [NarrativeController::class, 'delete_file'])->name('narratives.delete_file');
-    // Route::post('narratives/narrative_table', [NarrativeController::class, 'narrative_table'])->name('narratives.table');
-    // Route::post('case_studies/delete_image', [CaseStudyController::class, 'delete_image'])->name('case_studies.delete_image');
-
     
     Route::post('study_materials/delete_file', [StudyMaterialsController::class, 'delete_file'])->name('study_materials.delete_file');
     Route::resource('study_materials', StudyMaterialsController::class);
 
     Route::post('testimonials/delete_image', [TestimonialsController::class, 'delete_image'])->name('testimonials.delete_image');
     Route::resource('testimonials', TestimonialsController::class);
+    Route::post('narratives/delete_image', [NarrativesController::class, 'delete_image'])->name('narratives.delete_image');
     Route::resource('narratives', NarrativesController::class);
 
 
@@ -91,7 +87,7 @@ Route::group(['middleware' => 'auth'], function() {
     Route::get('user_profiles/active_profile', [UserProfileController::class, 'active_profile'])->name('user_profiles.active_profile');
     Route::resource('user_profiles', UserProfileController::class);
 
-    // View Reports
+    // Reports Index
     Route::get('reports/team/summary_performance', [ReportController::class, 'teamPerformanceSummary'])->name('reports.team_summary_performance');
     Route::get('reports/team/size_summary', [ReportController::class, 'teamSizeSummary'])->name('reports.team_size_summary');
     Route::get('reports/team/member_summary', [ReportController::class, 'teamMemberSummary'])->name('reports.team_member_summary');
@@ -100,7 +96,7 @@ Route::group(['middleware' => 'auth'], function() {
     Route::get('reports/team_report_card', [ReportController::class, 'teamReportCard'])->name('reports.team_report_card');
     Route::get('reports/monthly_pledge', [ReportController::class, 'monthlyPledge'])->name('reports.monthly_pledge');
     Route::get('reports/score_variance', [ReportController::class, 'scoreVariance'])->name('reports.score_variance');
-    // 
+    // Reports Query
     Route::post('reports/score_variance', [ReportController::class, 'scoreVariance'])->name('reports.score_variance.post');
     Route::post('reports/monthly_pledge', [ReportController::class, 'monthlyPledge'])->name('reports.monthly_pledge.post');
     Route::post('reports/team_report_card', [ReportController::class, 'teamReportCard'])->name('reports.team_report_card.post');

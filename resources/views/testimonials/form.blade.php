@@ -3,27 +3,27 @@
         <label for="date">Date<span class="text-danger">*</span></label>
         {{ Form::date('date', null, ['class' => 'form-control datepicker', 'id' => 'date', 'required']) }}
     </div>
-    <div class="col-md-6 col-12">
+    <div class="col-md-8 col-12">
         <label for="full_name">Full Name<span class="text-danger">*</span> (Testifier)</label>
         {{ Form::text('full_name', null, ['class' => 'form-control', 'placeholder' => 'Full Name', 'required' => 'required']) }}
     </div>
 </div>
 <div class="row mb-3">
-    <div class="col-md-12 col-12">
+    <div class="col-md-10 col-12">
         <label for="situation">Introduction<span class="text-danger">*</span></label>
         {{ Form::hidden('situation', null, ['id' => 'situation']) }}
         <div class="richtext" id="situation_text">{!! @$testimonial->situation !!}</div>
     </div>
 </div>
 <div class="row mb-3">
-    <div class="col-md-12 col-12">
+    <div class="col-md-10 col-12">
         <label for="intervention">Experience During The Study<span class="text-danger">*</span></label>
         {{ Form::hidden('intervention', null, ['id' => 'intervention']) }}
         <div class="richtext" id="intervention_text">{!! @$testimonial->intervention !!}</div>
     </div>
 </div>
 <div class="row mb-3">
-    <div class="col-md-12 col-12">
+    <div class="col-md-10 col-12">
         <label for="impact">Personal Transformation<span class="text-danger">*</span></label>
         {{ Form::hidden('impact', null, ['id' => 'impact']) }}
         <div class="richtext" id="impact_text">{!! @$testimonial->impact !!}</div>
@@ -46,6 +46,7 @@
         {{ Form::text('caption3', null, ['class' => 'form-control mt-1', 'placeholder' => 'Image 3 Caption']) }}
     </div>
 </div>
+<br><br>
 
 @section('script')
 <script>

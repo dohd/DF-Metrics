@@ -66,6 +66,7 @@ class TestimonialsController extends Controller
             ], 422);
         }
 
+        // image validation
         $validator = Validator::make($request->all(), [
             'image1' => $request->image1? 'required|mimes:png,jpg,jpeg' : 'nullable',
             'image2' => $request->image2? 'required|mimes:png,jpg,jpeg' : 'nullable',
@@ -78,9 +79,10 @@ class TestimonialsController extends Controller
             ], 422);
         }
 
+        $input = $request->except('_token');
+        $images = $request->only('image1', 'image2', 'image3');
+
         try {
-            $input = $request->except('_token');
-            $images = $request->only('image1', 'image2', 'image3');
             foreach ($images as $key => $value) {
                 $file = $request->file($key);
                 if ($file) {
@@ -150,6 +152,7 @@ class TestimonialsController extends Controller
             ], 422);
         }
 
+        // image validation
         $validator = Validator::make($request->all(), [
             'image1' => $request->image1? 'required|mimes:png,jpg,jpeg' : 'nullable',
             'image2' => $request->image2? 'required|mimes:png,jpg,jpeg' : 'nullable',
@@ -162,9 +165,10 @@ class TestimonialsController extends Controller
             ], 422);
         }
 
+        $input = $request->except('_token');
+        $images = $request->only('image1', 'image2', 'image3');
+        
         try {
-            $input = $request->except('_token');
-            $images = $request->only('image1', 'image2', 'image3');
             foreach ($images as $key => $value) {
                 $file = $request->file($key);
                 if ($file) {
