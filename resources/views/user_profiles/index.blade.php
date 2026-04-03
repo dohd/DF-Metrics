@@ -1,5 +1,4 @@
 @extends('layouts.core')
-
 @section('title', 'User Profile Management')
     
 @section('content')
@@ -16,6 +15,7 @@
                             <th>Telephone</th>
                             <th>Email</th>
                             <th>Role</th>
+                            <th>Team</th>
                             <th>Status</th>
                             <th>Action</th>
                           </tr>
@@ -28,6 +28,7 @@
                                     <td>{{ $user->phone }}</td>
                                     <td>{{ $user->email }}</td>
                                     <td>{{ ucfirst($user->user_type) }}</td>
+                                    <td>{{ @$user->team->name }}</td>
                                     <td>{!! $user->is_active_status_budge !!}</td>
                                     <td>{!! $user->action_buttons !!}</td>
                                 </tr>
