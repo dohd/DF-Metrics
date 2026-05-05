@@ -6,9 +6,15 @@ use App\Models\age_group\AgeGroup;
 use App\Models\department\Department;
 use App\Models\memberlist\MemberMinistry;
 use App\Models\ministry\Ministry;
+use App\Models\team\TeamMember;
 
 trait MemberlistItemRelationship
 {
+    public function teamMember()
+    {
+        return $this->hasOne(TeamMember::class, 'memberlist_item_id');
+    }
+
     public function memberMinistries()
     {
         return $this->hasMany(MemberMinistry::class);

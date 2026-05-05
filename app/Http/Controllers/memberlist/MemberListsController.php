@@ -163,11 +163,17 @@ class MemberListsController extends Controller
         try {
             DB::beginTransaction();
 
-            // create memberlist
+            // create member list
             $input = inputClean($input); 
             $memberlist->update($input); 
 
-            // memberlist items
+            // delete unverified member list items
+            $memberlist->items()
+                ->whereNotIn('id', collect($inputItems)->pluck('memberlist_item_id'))
+                ->whereDoesntHave('teamMember.verify_members')
+                ->delete();
+
+            // create or update member list item
             foreach ($inputItems as $value) {
                 $id = $value['memberlist_item_id'];
                 unset($value['memberlist_item_id']);
@@ -175,12 +181,10 @@ class MemberListsController extends Controller
                 $ministryIds = $value['ministry_id'];
                 if ($ministryIds) $value['ministry_id'] = $value['ministry_id'][0];
 
-                // create or update meberlist item
+                // create or update
                 $memberlistItem = $memberlist->items()->where('id', $id)->first();
                 if ($memberlistItem) $memberlistItem->update($value); 
-                else {
-                    $memberlistItem = $memberlist->items()->create($value);
-                }
+                else $memberlistItem = $memberlist->items()->create($value);
 
                 // create member ministries
                 $memberlistItem->memberMinistries()->delete();
@@ -212,8 +216,7 @@ class MemberListsController extends Controller
             } else {
                 $memberlist->team()->update(['name' => $memberlist->dfname->name]);
                 foreach ($memberlist->items as $item) {
-                    $memberlist->team->members()
-                    ->updateOrCreate(['memberlist_item_id' => $item->id], [
+                    $memberlist->team->members()->updateOrCreate(['memberlist_item_id' => $item->id], [
                         'full_name' => $item->member_name,
                         'df_name' => $memberlist->dfname->name,
                         'phone_no' => $item->phone_no,
@@ -239,7 +242,7 @@ class MemberListsController extends Controller
     public function destroy(Memberlist $memberlist)
     {
         if ($memberlist->team) {
-            return errorHandler('Member list has an associated team #' . tidCode('', $memberlist->team->tid));
+            return errorHandler('Member list is attached to team: ' . $memberlist->team->name);
         }
 
         try {
