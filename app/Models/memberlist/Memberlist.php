@@ -68,9 +68,10 @@ class Memberlist extends Model
             return $model;
         });
 
-        static::addGlobalScope('ins', function ($builder) {
-            if (isset(auth()->user()->ins)) {
-                $builder->where('ins', auth()->user()->ins);                
+        static::addGlobalScope('id', function ($builder) {
+            $user = auth()->user();
+            if ($user && in_array($user->user_type, ['shepherd', 'overseer']) && $user->teams->isNotEmpty()) {
+                $builder->whereIn('id', $user->teams->pluck('memberlist_id'));
             }
         });
     }

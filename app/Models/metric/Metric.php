@@ -68,8 +68,9 @@ class Metric extends Model
         });
 
         static::addGlobalScope('team_id', function ($builder) {
-            if (in_array(auth()->user()->user_type, ['captain', 'member'])) {
-                // $builder->where('team_id', auth()->user()->team_id);
+            $user = auth()->user();
+            if ($user && in_array($user->user_type, ['shepherd', 'overseer']) && $user->userTeams->isNotEmpty()) {
+                $builder->whereIn('team_id', $user->userTeams->pluck('team_id'));
             }
         });
     }

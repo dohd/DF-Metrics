@@ -67,8 +67,9 @@ class Team extends Model
         });
 
         static::addGlobalScope('id', function ($builder) {
-            if (in_array(auth()->user()->user_type, ['captain', 'member'])) {
-                // $builder->where('id', auth()->user()->team_id);
+            $user = auth()->user();
+            if ($user && in_array($user->user_type, ['shepherd', 'overseer']) && $user->userTeams->isNotEmpty()) {
+                $builder->whereIn('id', $user->userTeams->pluck('team_id'));
             }
         });
     }
