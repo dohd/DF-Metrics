@@ -23,6 +23,7 @@ class UserProfileController extends Controller
     {
         $users = User::where('id', '!=', auth()->user()->id)
             ->latest()
+            ->with(['teams:team_id,name'])
             ->get();
 
         return view('user_profiles.index', compact('users'));
@@ -56,15 +57,17 @@ class UserProfileController extends Controller
             'phone' => 'required',
         ]);
 
+        $input = $request->except('_token', 'team_ids');
+
         try {           
             DB::beginTransaction();
 
-            $input = array_replace($request->except('_token'), [
-                'password' => $request->phone,
-            ]);
+            $input['password'] = $request->phone;
             $user = User::create($input);
-            // $role = Role::find($input['role_id']);
-            // $user->assignRole($role->name);
+            
+            foreach ($request->team_ids ?? [] as $id) {
+                $user->userTeams()->create(['team_id' => $id]);
+            }
 
             DB::commit();
             return redirect(route('user_profiles.index'))->with(['success' => 'User created successfully']);
@@ -106,42 +109,43 @@ class UserProfileController extends Controller
      */
     public function update(Request $request, User $user_profile)
     {
-        if ($request->status != null) {
+        if (isset($request->status)) {
             try {
                 $user_profile->update(['is_active' => $request->input('status')]);
                 return redirect()->back()->with('success', 'Status updated successfully');
             } catch (\Throwable $th) {
                 return errorHandler('Error updating status!', $th);
             }
-        } else {
-            $request->validate([
-                'user_type' => 'required',
-                'fname' => 'required',
-                'lname' => 'required',
-                'email' => ['required', Rule::unique('users')->ignore($user_profile->id)],
-                'phone' => 'required',
-            ]);
-    
-            try {
-                DB::beginTransaction();
-                
-                $input = $request->only(['fname', 'lname', 'email', 'phone', 'user_type', 'team_id']);
-                // $role = Role::find($input['role_id']);
-                // $user_profile->syncRoles([$role->name]);
-                // dd($input);
+        } 
 
-                // reset password
-                if (!empty($input['phone'])) {
-                    $input['password'] = $input['phone'];
-                }
+        $request->validate([
+            'user_type' => 'required',
+            'fname' => 'required',
+            'lname' => 'required',
+            'email' => ['required', Rule::unique('users')->ignore($user_profile->id)],
+            'phone' => 'required',
+        ]);
+        $input = $request->only(['fname', 'lname', 'email', 'phone', 'user_type']);
 
-                $user_profile->update($input);
-                
-                DB::commit();
-                return redirect(route('user_profiles.index'))->with(['success' => 'User updated successfully']);
-            } catch (\Throwable $th) {
-                return errorHandler('Error updating User!', $th);
+        try {
+            DB::beginTransaction();
+
+            // reset password
+            if (!empty($input['phone'])) {
+                $input['password'] = $input['phone'];
             }
+
+            $user_profile->update($input);
+
+            $user_profile->userTeams()->delete();
+            foreach ($request->team_ids ?? [] as $id) {
+                $user_profile->userTeams()->create(['team_id' => $id]);
+            }
+            
+            DB::commit();
+            return redirect(route('user_profiles.index'))->with(['success' => 'User updated successfully']);
+        } catch (\Throwable $th) {
+            return errorHandler('Error updating User!', $th);
         }
     }
 
@@ -154,10 +158,12 @@ class UserProfileController extends Controller
     public function destroy(User $user_profile)
     {
         try {     
-            // $role = Role::find($user_profile->role_id);
-            // $user_profile->removeRole($role->name);       
+            DB::beginTransaction();
+
+            $user_profile->userTeams()->delete();    
             $user_profile->delete();
 
+            DB::commit();
             return redirect(route('user_profiles.index'))->with(['success' => 'User deleted successfully']);
         } catch (\Throwable $th) { 
             return errorHandler('Error deleting User!', $th);

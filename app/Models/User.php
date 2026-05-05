@@ -70,16 +70,14 @@ class User extends Authenticatable
     {
         parent::boot();
 
-        static::creating(function ($instance) {
+        static::creating(function ($model) {
             if (auth()->id()) {
-                $instance->created_by = auth()->user()->id;
-                $instance->ins = auth()->user()->ins;                
+                $model->created_by = auth()->id();
+                $model->ins = auth()->user()->ins;                
             }
-            return $instance;
+            return $model;
         });
 
-        static::addGlobalScope('ins', function ($builder) {
-            // $builder->where('ins', auth()->user()->ins);
-        });
+        // static::addGlobalScope(new UserDataScope);
     }
 }

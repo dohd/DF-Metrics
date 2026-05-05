@@ -7,6 +7,16 @@ use App\Models\team\Team;
 
 trait UserRelationship
 {
+    public function teams()
+    {
+        return $this->hasManyThrough(Team::class, UserTeam::class, 'user_id', 'id', 'id', 'team_id');
+    }
+
+    public function userTeams()
+    {
+        return $this->hasMany(UserTeam::class);
+    }
+
     public function team()
     {
         return $this->belongsTo(Team::class);

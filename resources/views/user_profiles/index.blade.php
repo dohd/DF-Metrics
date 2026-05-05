@@ -28,7 +28,7 @@
                                     <td>{{ $user->phone }}</td>
                                     <td>{{ $user->email }}</td>
                                     <td>{{ ucfirst($user->user_type) }}</td>
-                                    <td>{{ @$user->team->name }}</td>
+                                    <td>{{ $user->teams->pluck('name')->implode(', ') }}</td>
                                     <td>{!! $user->is_active_status_budge !!}</td>
                                     <td>{!! $user->action_buttons !!}</td>
                                 </tr>

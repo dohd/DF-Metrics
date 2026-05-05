@@ -39,10 +39,10 @@
 <div class="row mb-3">
     <label for="user_type" class="col-md-2">Team</label>
     <div class="col-md-6 col-12">
-        <select name="team_id" id="team" class="form-control select2" data-placeholder="Choose Team" autocomplete="false">
+        <select name="team_ids[]" id="team" class="form-control select2" data-placeholder="Choose Team" autocomplete="false" multiple>
             <option value=""></option>
             @foreach ($teams as $team)
-                <option value="{{ $team->id }}" {{ @$user_profile->team_id == $team->id? 'selected' : '' }}>
+                <option value="{{ $team->id }}" {{ isset($user_profile) && $user_profile->userTeams->where('team_id', $team->id)->isNotEmpty()? 'selected' : '' }}>
                     {{ tidCode('', $team->tid) }} - {{ $team->name }}
                 </option>
             @endforeach
