@@ -1,15 +1,11 @@
 <aside id="sidebar" class="sidebar">
   <ul class="sidebar-nav" id="sidebar-nav">
     <li class="nav-item">
-      <a class="nav-link" href="{{ route('home') }}">
-        <i class="bi bi-grid"></i>
-        <span>Dashboard</span>
-      </a>
+      <a class="nav-link" href="{{ route('home') }}"><i class="bi bi-grid"></i> <span>Dashboard</span></a>
     </li>
-    <!-- End Dashboard Nav -->
 
-    {{-- User type: deacon, overseer --}}
-    @if (in_array(auth()->user()->user_type, ['deacon', 'overseer']))
+    {{-- User type: deacon --}}
+    @if (in_array(auth()->user()->user_type, ['deacon']))
       <li class="nav-heading">Study Session</li>
       <!-- Study Materials -->
       <li class="nav-item">
@@ -141,12 +137,9 @@
       </li>
     @endif
 
-    
 
-
-
-    {{-- User type: shephered --}}
-    @if (in_array(auth()->user()->user_type, ['shepherd']))
+    {{-- User type: shephered, overseer --}}
+    @if (in_array(auth()->user()->user_type, ['shepherd', 'overseer']))
       <li class="nav-heading">Study Session</li>
       <!-- Study Materials -->
       <li class="nav-item">

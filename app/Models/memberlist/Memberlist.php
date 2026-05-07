@@ -60,7 +60,7 @@ class Memberlist extends Model
         parent::boot();
 
         static::creating(function ($model) {
-            $model->tid = Memberlist::max('tid') + 1;
+            $model->tid = Memberlist::max('tid')+1;
             if (auth()->id()) {
                 $model->user_id = auth()->user()->id;
                 $model->ins = auth()->user()->ins;
@@ -71,7 +71,7 @@ class Memberlist extends Model
         static::addGlobalScope('id', function ($builder) {
             $user = auth()->user();
             if ($user && in_array($user->user_type, ['shepherd', 'overseer']) && $user->teams->isNotEmpty()) {
-                $builder->whereIn('id', $user->teams->pluck('memberlist_id'));
+                $builder->whereIn('memberlists.id', $user->teams->pluck('memberlist_id'));
             }
         });
     }

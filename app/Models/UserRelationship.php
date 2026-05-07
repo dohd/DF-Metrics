@@ -9,7 +9,7 @@ trait UserRelationship
 {
     public function teams()
     {
-        return $this->hasManyThrough(Team::class, UserTeam::class, 'user_id', 'id', 'id', 'team_id');
+        return $this->hasManyThrough(Team::class, UserTeam::class, 'user_id', 'id', 'id', 'team_id')->withoutGlobalScopes();
     }
 
     public function userTeams()

@@ -12,7 +12,6 @@ use App\Http\Controllers\dfzone\DFZonesController;
 use App\Http\Controllers\memberlist\MemberListsController;
 use App\Http\Controllers\metric\MetricController;
 use App\Http\Controllers\ministry\MinistriesController;
-use App\Http\Controllers\pdf\PdfController;
 use App\Http\Controllers\programme\ProgrammeController;
 use App\Http\Controllers\report\ReportController;
 use App\Http\Controllers\score_card\ScoreCardController;
@@ -39,7 +38,7 @@ use Illuminate\Support\Facades\Route;
 Auth::routes();
 Route::get('/', [LoginController::class, 'index']);
 Route::get('logout', [LoginController::class, 'logout']);
-Route::group(['middleware' => 'auth'], function() {
+Route::group(['middleware' => array('auth', 'user.permission')], function() {
     // Dashboard
     Route::get('home', [HomeController::class, 'index'])->name('home');
 
@@ -105,9 +104,6 @@ Route::group(['middleware' => 'auth'], function() {
     Route::post('reports/team/size_summary', [ReportController::class, 'teamSizeSummary'])->name('reports.team_size_summary.post');
     Route::post('reports/team/member_summary', [ReportController::class, 'teamMemberSummary'])->name('reports.team_member_summary.post');
     Route::post('reports/team/summary_performance', [ReportController::class, 'teamPerformanceSummary'])->name('reports.team_summary_performance.post');
-
-    // PDF Report
-    Route::get('pdfs/agenda/{agenda}/{token}', [PdfController::class, 'print_agenda'])->name('pdfs.print_agenda');
 
     // Storage
     Route::get('files/download/{file_params}', [StorageController::class, 'file_download'])->name('storage.file_download');
