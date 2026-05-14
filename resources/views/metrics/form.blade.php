@@ -167,7 +167,6 @@
             <div class="fw-semibold">
                 <i class="bi bi-check2-square"></i> Confirm Members
             </div>
-
             <div class="d-flex gap-2">
                 <button type="button" class="btn btn-sm btn-outline-secondary select-all">
                     <i class="bi bi-check-all"></i> Select All
@@ -178,8 +177,7 @@
             </div>
         </div>
 
-        <div class="row g-3 member-checkbox-grid">
-        </div>                            
+        <div class="row g-3 member-checkbox-grid"></div>                            
     </div>    
 </div>
 <br><br>
@@ -202,7 +200,7 @@
     // ========= render checkbox grid =========
     function renderMonthCheckboxes() {
         $('.member-checkbox-grid').html('');
-        $.post("{{ route('metrics.verified_team_members') }}", {
+        return $.post("{{ route('metrics.verified_team_members') }}", {
             team_id: $('#team').val(),
             is_metric_edit: "{{ @$metric->id }}",
         })
@@ -235,20 +233,29 @@
 
     // onchange team
     $('#team').change(function() {
-        renderMonthCheckboxes();
+        renderMonthCheckboxes()
+        .then(resp => {
+            // member amount collection
+            const metric = $('#programme :selected').attr('metric');
+            if (metric === 'Attendance') {
+                $('.member-amount').removeClass('d-none');
+            } else {
+                $('.member-amount').addClass('d-none');
+            }            
+        });
     });
 
     // onchange programme
     $('#programme').change(function() {
+        $('#team').change();
+        $('#date').trigger('change');
+
         const metric = $(this).find(':selected').attr('metric');
         $('.metric').each(function() {
-            if ($(this).attr('key') == metric) $(this).removeClass('d-none');
+            if ($(this).attr('key') === metric) $(this).removeClass('d-none');
             else $(this).addClass('d-none');
         });
-
-        $('#date').trigger('change');
     });
-    $('#programme').trigger('change');
 
     // onchange date
     $('#date').change(function() {
@@ -261,35 +268,56 @@
             return currDate >= start && currDate <= end;
         });
 
-        if (ranges.length && !isWithin) {
+        if ($(this).val() && ranges.length && !isWithin) {
             $(this).val('');
             return alert('Date is not within the allowed range!');
         }
     });
 
-    // onchange grant-amount, team-mission-amount
-    $('form').on('change', '#grant_amount, #team_mission_amount', function() {
-        const val = accounting.unformat($(this).val());
-        $(this).val(accounting.formatNumber(val));
+    // onchange grant-amount, team-mission-amount, collected-amount
+    $('form').on('change', '#grant_amount, #team_mission_amount, #collected_amount', function() {
+        const amount = accounting.unformat($(this).val());
+        $(this).val(accounting.formatNumber(amount));
     });
+    $('form').on('keyup', '.member-amount', function() {
+        let totalAmount = 0;
+        $('.member-amount').each(function() {
+            totalAmount += accounting.unformat($(this).val());
+        });
+        $('#collected_amount').val(accounting.formatNumber(totalAmount));
+    });
+
+
 
     // on editing
     const metric = @json(@$metric);
-    if (metric?.id && metric.in_score) {
-        $('#date').attr('readonly', true);
-        $('.metric input').attr('readonly', true);
-        $('#programme, #team').attr('disabled', true);
-        const programmeInp = `<input type="hidden" name="programme_id" value="${$('#programme').val()}">`;
-        const teamInp = `<input type="hidden" name="team_id" value="${$('#team').val()}">`;
-        $('form').append(programmeInp + teamInp);
+    if (metric?.id) {
+        $('#programme').change();
+        $('#grant_amount, #team_mission_amount, #collected_amount').change();
+        // metric has been scored
+        if (metric.in_score) {
+            $('#date').attr('readonly', true);
+            $('.metric input').attr('readonly', true);
+            $('#programme, #team').attr('disabled', true);
+            const dynamicInpt = `
+                <input type="hidden" name="programme_id" value="${$('#programme').val()}">
+                <input type="hidden" name="team_id" value="${$('#team').val()}">`;
+            $('form').append(dynamicInpt);            
+        } 
     }
 
     const metricMembers = @json($metric->metricMembers ?? []);
     if (metricMembers.length) {
-        renderMonthCheckboxes();
+        renderMonthCheckboxes()
+        .then(resp => {
+            // member amount collection
+            const metric = $('#programme :selected').attr('metric');
+            if (metric === 'Attendance') {
+                $('.member-amount').removeClass('d-none');
+            } else {
+                $('.member-amount').addClass('d-none');
+            }            
+        });
     }
-
-    
-
 </script>
 @stop

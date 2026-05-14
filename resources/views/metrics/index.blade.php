@@ -164,12 +164,14 @@
         })
         .done(data => {
             $('#metricsTbl tbody').html(data);
-            dataTable = new simpleDatatables.DataTable('#metricsTbl', {
-                columns: [
-                    {select: 0, sortable: false},
-                    {select: 8, sortable: false},
-                ],
-            });
+            setTimeout(() => {
+                dataTable = new simpleDatatables.DataTable('#metricsTbl', {
+                    columns: [
+                        {select: 0, sortable: false},
+                        {select: 7, sortable: false},
+                    ],
+                });                
+            },200);
         })
         .fail((xhr, status, err) => {
             if (status !== 'abort') {

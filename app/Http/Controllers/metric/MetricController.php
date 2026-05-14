@@ -80,10 +80,6 @@ class MetricController extends Controller
             'programme_id' => 'required|integer|exists:programmes,id',
             'team_id' => 'required|integer|exists:teams,id',
 
-            'grant_amount' => ['nullable', 'regex:/^(\d+|\d{1,3}(,\d{3})*)(\.\d{2})?$/'],
-            'team_mission_amount' => ['nullable', 'regex:/^(\d+|\d{1,3}(,\d{3})*)(\.\d{2})?$/'],
-            'collected_amount' => ['nullable', 'regex:/^(\d+|\d{1,3}(,\d{3})*)(\.\d{2})?$/'],
-
             'team_total' => 'nullable|numeric|min:0',
             'retreat_leader_total' => 'nullable|numeric|min:0',
             'online_meeting_team_total' => 'nullable|numeric|min:0',
@@ -96,11 +92,11 @@ class MetricController extends Controller
             'other_activities_total' => 'nullable|numeric|min:0',
         ]);
 
-       
+        $teamMembersData = $request->only('team_member_id', 'member_collected_amount');
+        $input = inputClean($request->except('_token', 'team_member_id', 'member_collected_amount'));
+
         try {
-            $teamMembersData = $request->only('team_member_id');
-            $input = inputClean($request->except('_token'));
-            unset($input['team_member_id']);
+            // sanitize
             foreach ($input as $key => $value) {
                 $keys = [
                     'team_total', 'guest_total', 'grant_amount', 'retreat_leader_total', 'online_meeting_team_total', 'activities_total', 'summit_leader_total',
@@ -130,7 +126,10 @@ class MetricController extends Controller
 
             // create members data
             $n = count($teamMembersData['team_member_id'] ?? []);
-            if ($n) {
+            if ($n > 0) {
+                if (isset($teamMembersData['member_collected_amount'])) {
+                    $teamMembersData['member_collected_amount'] = array_map(fn($v) => numberClean($v),  $teamMembersData['member_collected_amount']);
+                }
                 $teamMembersData = array_replace($teamMembersData, [
                     'metric_id' => array_fill(0, $n, $metric->id),
                     'team_id' => array_fill(0, $n, $metric->team_id),
@@ -203,10 +202,6 @@ class MetricController extends Controller
             'programme_id' => 'required|integer|exists:programmes,id',
             'team_id' => 'required|integer|exists:teams,id',
 
-            'grant_amount' => ['nullable', 'regex:/^(\d+|\d{1,3}(,\d{3})*)(\.\d{2})?$/'],
-            'team_mission_amount' => ['nullable', 'regex:/^(\d+|\d{1,3}(,\d{3})*)(\.\d{2})?$/'],
-            'collected_amount' => ['nullable', 'regex:/^(\d+|\d{1,3}(,\d{3})*)(\.\d{2})?$/'],
-
             'team_total' => 'nullable|numeric|min:0',
             'retreat_leader_total' => 'nullable|numeric|min:0',
             'online_meeting_team_total' => 'nullable|numeric|min:0',
@@ -219,11 +214,10 @@ class MetricController extends Controller
             'other_activities_total' => 'nullable|numeric|min:0',
         ]);
 
-        $teamMembersData = $request->only('team_member_id');
-        $input = inputClean($request->except('_token'));
+        $teamMembersData = $request->only('team_member_id', 'member_collected_amount');
+        $input = inputClean($request->except('_token', 'team_member_id', 'member_collected_amount'));
 
         try {     
-            unset($input['team_member_id']);
             foreach ($input as $key => $value) {
                 $keys = [
                     'team_total', 'guest_total', 'grant_amount', 'retreat_leader_total', 'online_meeting_team_total', 'activities_total', 'summit_leader_total',
@@ -233,30 +227,34 @@ class MetricController extends Controller
                 if (in_array($key, $keys)) $input[$key] = numberClean($value);
             }
 
-            // duplicate entry
+            // duplicate metric entry
             $is_exists = Metric::where('id', '!=', $metric->id)
                 ->whereDate('date', $input['date'])
                 ->where(['programme_id' => $input['programme_id'], 'team_id' => $input['team_id']])
                 ->exists();
             if ($is_exists) return errorHandler('Metric input exists for a similar date');
 
-            // duplicate meeting
+            // duplicate meeting metric
             $is_exists = Metric::where('id', '!=', $metric->id)
                 ->whereHas('programme', fn($q) => $q->where('metric', 'Online-Meeting'))
                 ->whereMonth('date', date('m', strtotime($input['date'])))
                 ->whereYear('date', date('Y', strtotime($input['date'])))
                 ->where(['programme_id' => $input['programme_id'], 'team_id' => $input['team_id']])
                 ->exists();
-            if ($is_exists) return errorHandler('Metric input exists for a similar month');
+            if ($is_exists) return errorHandler('Metric input for online-meeting exists for a similar month');
 
             DB::beginTransaction();
-
+        
+            // update metric
             $metric->update($input);
 
             // create members data
             $metric->metricMembers()->delete();
             $n = count($teamMembersData['team_member_id'] ?? []);
-            if ($n) {
+            if ($n > 0) {
+                if (isset($teamMembersData['member_collected_amount'])) {
+                    $teamMembersData['member_collected_amount'] = array_map(fn($v) => numberClean($v),  $teamMembersData['member_collected_amount']);
+                }
                 $teamMembersData = array_replace($teamMembersData, [
                     'metric_id' => array_fill(0, $n, $metric->id),
                     'team_id' => array_fill(0, $n, $metric->team_id),
@@ -339,8 +337,7 @@ class MetricController extends Controller
             ->whereHas('verify_members', fn($q) => $q->whereYear('date', $year))
             ->with([
                 'metricMembers' => function($q) {
-                    $q->where('team_id', request('team_id'))
-                    ->select('id', 'team_member_id', 'checked');
+                    $q->where('team_id', request('team_id'));
                 },
                 'verify_members' => fn($q) => $q->select('id', 'team_member_id', 'category'),
             ])
