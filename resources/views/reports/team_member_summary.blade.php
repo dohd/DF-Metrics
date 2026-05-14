@@ -22,15 +22,16 @@
         <div class="card-content p-2">
             {{ Form::open(['route' => 'reports.team_member_summary.post', 'method' => 'POST', 'target' => '_blank']) }}
                 <div class="row mb-3">
-                    <label for="date" class="col-md-2">From Date</label>
+                    <label for="month" class="col-md-2">Month</label>
                     <div class="col-md-6 col-12">
-                        {{ Form::date('date_from', null, ['class' => 'form-control']) }}
-                    </div>
-                </div>
-                <div class="row mb-3">
-                    <label for="date" class="col-md-2">To Date</label>
-                    <div class="col-md-6 col-12">
-                        {{ Form::date('date_to', null, ['class' => 'form-control']) }}
+                        <select name="month" id="month" class="form-control select2" data-placeholder="Search Month" required>
+                            <option value=""></option>
+                            @foreach ($monthSet as $month)
+                                <option value="{{ $month }}">
+                                    {{ date('F Y', strtotime($month . '-01')) }}
+                                </option>
+                            @endforeach
+                        </select>   
                     </div>
                 </div>
                 <div class="row mb-3">

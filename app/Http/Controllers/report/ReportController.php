@@ -17,32 +17,42 @@ class ReportController extends Controller
     public function teamMemberSummary(Request $request)
     {
         if (!$request->post()) {
-            $teams = Team::whereHas('verify_members.teamMember')->get();
-            return view('reports.team_member_summary', compact('teams'));
+            $teams = Team::whereHas('verify_members.teamMember.memberlistItem')
+                ->with(['verify_members'])
+                ->get();
+            $monthSet = $teams->flatMap(fn($team) => $team->verify_members->pluck('date'))
+                ->map(fn($date) => Carbon::parse($date)->format('Y-m'))
+                ->unique()
+                ->values();
+
+            return view('reports.team_member_summary', compact('teams', 'monthSet'));
         }
 
         $input = inputClean($request->except('_token'));
+        $start = Carbon::parse(request('month') . '-01');
 
         $filename = 'Team Member Summary';
         $meta['title'] = 'Team Member Summary';
-        $meta['date_from'] = dateFormat($request->date_from);
-        $meta['date_to'] = dateFormat($request->date_to);
+        $meta['date_from'] = $start->startOfMonth()->format('d-m-Y');
+        $meta['date_to'] = $start->endOfMonth()->format('d-m-Y');
+        $input['date_from'] = $start->startOfMonth()->format('Y-m-d');
+        $input['date_to'] = $start->endOfMonth()->format('Y-m-d');
         
-        $records = Team::when(request('team_id'), fn($q) => $q->whereIn('id', [request('team_id')]))
-        ->whereHas('verify_members', function($q) use($input) {
-            $q->whereBetween('date', [$input['date_from'], $input['date_to']]);
-            $q->whereHas('teamMember.memberlistItem');
-        })
-        ->with([
-            'verify_members' => function($q) use($input) {
-                $q->whereBetween('date', [$input['date_from'], $input['date_to']])
-                ->whereHas('teamMember.memberlistItem')
-                ->selectRaw('MIN(team_id) team_id, team_member_id, category, COUNT(*) count')
-                ->groupBy('team_member_id', 'category');
-            },
-            'verify_members.teamMember.memberlistItem',
-        ])
-        ->get();
+        $records = Team::when(request('team_id'), fn($q) => $q->where('id', request('team_id')))
+            ->whereHas('verify_members', function($q) use($input) {
+                $q->whereBetween('date', [$input['date_from'], $input['date_to']]);
+                $q->whereHas('teamMember.memberlistItem');
+            })
+            ->with([
+                'verify_members' => function($q) use($input) {
+                    $q->whereBetween('date', [$input['date_from'], $input['date_to']])
+                    ->whereHas('teamMember.memberlistItem')
+                    ->selectRaw('MIN(team_id) team_id, team_member_id, category, COUNT(*) count')
+                    ->groupBy('team_member_id', 'category');
+                },
+                'verify_members.teamMember.memberlistItem',
+            ])
+            ->get();
         
         switch ($request->output) {
             case 'pdf_print':
