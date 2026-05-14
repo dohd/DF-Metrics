@@ -1,20 +1,25 @@
 <div class="row mb-3">
-    <label for="date" class="col-md-2">Date</label>
-    <div class="col-md-8 col-12">
-        {{ Form::date('date', null, ['class' => 'form-control', 'id' => 'date', 'required' => 'required']) }}
-    </div>
-</div>
-<div class="row mb-3">
     <label for="programme" class="col-md-2">Program</label>
     <div class="col-md-8 col-12">
         <select name="programme_id" id="programme" class="form-control select2" data-placeholder="Choose Program" required>
             <option value=""></option>
             @foreach ($programmes as $row)
-                <option value="{{ $row->id }}" metric="{{ $row->metric ?: 'Finance' }}" {{ $row->id == @$metric->programme_id? 'selected' : '' }}>
+                <option 
+                    value="{{ $row->id }}" 
+                    metric="{{ $row->metric ?: 'Finance' }}" 
+                    metric_date_set_json="{{ $row->metric_date_set_json }}"
+                    {{ $row->id == @$metric->programme_id? 'selected' : '' }}
+                >
                     {{ tidCode('', $row->tid) }} - {{ $row->name }}
                 </option>
             @endforeach
         </select>   
+    </div>
+</div>
+<div class="row mb-3">
+    <label for="date" class="col-md-2">Date</label>
+    <div class="col-md-8 col-12">
+        {{ Form::date('date', null, ['class' => 'form-control', 'id' => 'date', 'required' => 'required']) }}
     </div>
 </div>
 <div class="row mb-3">
@@ -228,20 +233,42 @@
         }
     });
 
+    // onchange team
     $('#team').change(function() {
         renderMonthCheckboxes();
     });
 
+    // onchange programme
     $('#programme').change(function() {
         const metric = $(this).find(':selected').attr('metric');
         $('.metric').each(function() {
             if ($(this).attr('key') == metric) $(this).removeClass('d-none');
             else $(this).addClass('d-none');
         });
-    });
-    $('#programme').change();
 
-    $('form').on('change', '#grant_amount,#team_mission_amount', function() {
+        $('#date').trigger('change');
+    });
+    $('#programme').trigger('change');
+
+    // onchange date
+    $('#date').change(function() {
+        const currDate = new Date($(this).val());
+        const ranges = JSON.parse($('#programme :selected').attr('metric_date_set_json') || '[]');
+
+        const isWithin = ranges.some(range => {
+            const start = new Date(range.start_date);
+            const end = new Date(range.end_date);
+            return currDate >= start && currDate <= end;
+        });
+
+        if (ranges.length && !isWithin) {
+            $(this).val('');
+            return alert('Date is not within the allowed range!');
+        }
+    });
+
+    // onchange grant-amount, team-mission-amount
+    $('form').on('change', '#grant_amount, #team_mission_amount', function() {
         const val = accounting.unformat($(this).val());
         $(this).val(accounting.formatNumber(val));
     });
@@ -261,5 +288,8 @@
     if (metricMembers.length) {
         renderMonthCheckboxes();
     }
+
+    
+
 </script>
 @stop

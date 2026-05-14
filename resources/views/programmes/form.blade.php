@@ -71,6 +71,16 @@
         </select>   
     </div>
 </div>
+<!-- Metric date-set -->
+<div class="row mb-3">
+    <div class="col-md-2">
+        <input type="hidden" name="metric_date_set_json" id="metricDataSetJson">
+    </div>
+    <div class="col-md-5 col-12">
+        @include('programmes.partials.metric_date_set')
+    </div>
+</div>
+
 <div class="row mb-3">
     <label for="include_choir" class="col-md-2">Include Choir</label>
     <div class="col-md-8 col-12">
@@ -138,7 +148,7 @@
             {{ Form::hidden('bandjson', null, ['class' => 'form-control', 'id' => 'bandJson']) }}
         </div>
         <div class="col-md-5 col-12">
-            @include('programmes.partials.bands')
+            @include('programmes.partials.scoring_bands')
         </div>
     </div>
     
@@ -182,7 +192,8 @@
 
             $('#is_active').change(Form.onChangeIsActive);
             $('#isCumulative').change(Form.onChangeIsCumulative);
-            $('#bandsTable').on('keyup', '.band-threshold, .band-points', Form.onKeyupBands);
+            $('#bandsTable').on('keyup', '.band-threshold, .band-points', Form.onKeyUpBands);
+            $('#metricDateSetTable').on('change', '.start-date, .end-date', Form.onChangeDateSet);
 
             // Edit Mode
             Form.editMode();
@@ -199,6 +210,14 @@
                 else $('#isCumulative').prop('checked', false).change();
                 $('#cumulativeProgramme').val(data.cumulative_programme_id).change();
 
+                // set metric date set
+                const dateSet = JSON.parse(data.metric_date_set_json) || [];
+                dateSet.forEach((v,i) => {
+                    $(`.start-date:eq(${i})`).val(v.start_date);
+                    $(`.end-date:eq(${i})`).val(v.end_date);
+                });
+
+                // set bands
                 const bands = JSON.parse(data.bandjson) || [];
                 bands.forEach((v,i) => {
                     $(`.band-threshold:eq(${i})`).val(v.threshold);
@@ -213,7 +232,7 @@
             }
         },
 
-        onKeyupBands() {        
+        onKeyUpBands() {        
             const payload = [];
             $('#bandsTable tbody tr').each(function() {
                 const threshold = accounting.unformat($(this).find('.band-threshold').val());
@@ -226,7 +245,19 @@
                     payload.push({threshold, points});
                 }
             });
-            $('#bandJson').val(JSON.stringify(payload));
+            $('#bandJson').val(payload.length? JSON.stringify(payload) : '');
+        },
+
+        onChangeDateSet() {
+            const payload = [];
+            $('#metricDateSetTable tbody tr').each(function() {
+                const start_date = $(this).find('.start-date').val();
+                const end_date = $(this).find('.end-date').val();
+                if (start_date || end_date) {
+                    payload.push({start_date, end_date});
+                }
+            });
+            $('#metricDataSetJson').val(payload.length? JSON.stringify(payload) : '');
         },
 
         onChangeMetric() {

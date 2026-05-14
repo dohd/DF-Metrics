@@ -20,12 +20,6 @@ class MetricController extends Controller
      */
     public function index()
     {
-        // team composition error
-        // session()->pull('warning');
-        if (!confirmTeamCompositionUpdated() && !session('warning')) {
-            // session(['warning' => 'Updated team composition is required!']);
-        }
-
         $programmes = Programme::where('is_active', 1)->get();
         $teams = Team::where('is_active', 1)->get();
 

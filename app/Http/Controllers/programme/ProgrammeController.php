@@ -52,7 +52,7 @@ class ProgrammeController extends Controller
         $input = $request->except('_token');
         $numDateFields = $request->except([
             'name', 'is_cumulative', 'cumulative_programme_id', 'metric', 'team_size', 
-            'compute_type', 'bandjson', 'memo',  'include_choir',                        
+            'compute_type', 'bandjson', 'memo',  'include_choir', 'metric_date_set_json',                    
         ]);
 
         try {     
@@ -120,14 +120,16 @@ class ProgrammeController extends Controller
             'score' => request('metric') == 'Finance'? 'required' : '',
             'max_extra_score' => request('extra_score')? 'required' : '',
         ]);
+
         $input = $request->except('_token');
-        $numDateFields = $request->except([
+        $numbersAndDateFields = $request->except([
             'name', 'is_cumulative', 'cumulative_programme_id', 'metric', 'team_size', 
-            'compute_type', 'bandjson', 'memo',  'include_choir',                        
+            'compute_type', 'bandjson', 'memo',  'include_choir', 'metric_date_set_json',                        
         ]);
 
         try {    
-            foreach ($numDateFields as $key => $value) {
+            // sanitize
+            foreach ($numbersAndDateFields as $key => $value) {
                 if (in_array($key, ['period_from', 'period_to', 'amount_perc_by'])) $input[$key] = databaseDate($value);
                 else $input[$key] = numberClean($value);
             }
