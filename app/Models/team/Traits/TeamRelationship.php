@@ -58,6 +58,6 @@ trait TeamRelationship
 
     public function metrics()
     {
-        return $this->hasMany(Metric::class);
+        return $this->hasMany(Metric::class)->withoutGlobalScopes();
     }
 }
