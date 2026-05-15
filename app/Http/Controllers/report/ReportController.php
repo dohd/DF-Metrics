@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\report;
 
 use App\Http\Controllers\Controller;
+use App\Models\age_group\AgeGroup;
 use App\Models\metric\Metric;
 use App\Models\programme\Programme;
 use App\Models\team\Team;
@@ -11,6 +12,64 @@ use Carbon\Carbon;
 
 class ReportController extends Controller
 {
+    /**
+     * Team Attendance Summary
+     */
+    public function attendanceSummary(Request $request)
+    {
+        if (!$request->post()) {
+            $teams = Team::whereHas('verify_members.teamMember.memberlistItem')
+                ->with(['verify_members'])
+                ->get();
+            $programmes = Programme::whereHas('metrics')->where('is_active', 1)->get();
+            return view('reports.attendance_summary', compact('teams', 'programmes'));
+        }
+
+        $input = inputClean($request->except('_token'));
+
+        $filename = 'Attendance Summary';
+        $meta['title'] = 'Attendance Summary';
+        $meta['date_from'] = dateFormat($request->date_from);
+        $meta['date_to'] = dateFormat($request->date_to);
+        $meta['age_groups'] = AgeGroup::get(['id', 'bracket']);
+        $meta['programme'] = Programme::findOrFail(request('programme_id'), ['id', 'name']);
+        
+        $records = Team::when(request('team_id'), fn($q) => $q->where('id', request('team_id')))
+            ->whereHas('metricMembers')
+            ->with([
+                'metricMembers:id,team_id,team_member_id',
+                'metricMembers.teamMember:id,memberlist_item_id',
+                'metricMembers.teamMember.memberlistItem:id,age_group_id',                
+            ])
+            ->get()
+            ->map(function($team) {
+                // Flatten all age_group_ids from nested relations
+                $ageGroups = $team->metricMembers->pluck('teamMember.memberlistItem.age_group_id')->filter();
+                // Count occurrences by age_group_id
+                $team->age_groups = $ageGroups->countBy();
+                return $team;
+            });
+        
+        switch ($request->output) {
+            case 'pdf_print':
+                $html = view('reports.pdf.print_attendance_summary', compact('records', 'meta'))->render();
+                $headers = [
+                    "Content-type" => "application/pdf",
+                    "Pragma" => "no-cache",
+                    "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
+                    "Expires" => "0"
+                ];
+                $pdf = new \Mpdf\Mpdf(array_replace(config('pdf'), ['format' => 'A4-L']));
+                $pdf->WriteHTML($html);
+                return response()->stream($pdf->Output($filename . '.pdf', 'I'), 200, $headers);
+            case 'pdf':
+                $html = view('reports.pdf.attendance_summary', compact('records', 'meta'))->render();
+                $pdf = new \Mpdf\Mpdf(array_replace(config('pdf'), ['format' => 'A4-L']));
+                $pdf->WriteHTML($html);
+                return $pdf->Output($filename . '.pdf', 'D');
+        }
+    }
+
     /**
      * Team Member Summary
      */

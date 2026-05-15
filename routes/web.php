@@ -95,12 +95,16 @@ Route::group(['middleware' => array('auth', 'user.permission')], function() {
     Route::get('reports/team_report_card', [ReportController::class, 'teamReportCard'])->name('reports.team_report_card');
     Route::get('reports/monthly_pledge', [ReportController::class, 'monthlyPledge'])->name('reports.monthly_pledge');
     Route::get('reports/score_variance', [ReportController::class, 'scoreVariance'])->name('reports.score_variance');
+    Route::get('reports/attendance_summary', [ReportController::class, 'attendanceSummary'])->name('reports.attendance_summary');
+    
     // Reports Query
+    Route::post('reports/attendance_summary', [ReportController::class, 'attendanceSummary'])->name('reports.attendance_summary.post');
     Route::post('reports/score_variance', [ReportController::class, 'scoreVariance'])->name('reports.score_variance.post');
     Route::post('reports/monthly_pledge', [ReportController::class, 'monthlyPledge'])->name('reports.monthly_pledge.post');
     Route::post('reports/team_report_card', [ReportController::class, 'teamReportCard'])->name('reports.team_report_card.post');
     Route::post('reports/monthly_pledge_vs_mission', [ReportController::class, 'monthlyPledgeVsMission'])->name('reports.monthly_pledge_vs_mission.post');
     Route::post('reports/team/metric_summary', [ReportController::class, 'metricSummary'])->name('reports.metric_summary.post');
+    
     Route::post('reports/team/size_summary', [ReportController::class, 'teamSizeSummary'])->name('reports.team_size_summary.post');
     Route::post('reports/team/member_summary', [ReportController::class, 'teamMemberSummary'])->name('reports.team_member_summary.post');
     Route::post('reports/team/summary_performance', [ReportController::class, 'teamPerformanceSummary'])->name('reports.team_summary_performance.post');

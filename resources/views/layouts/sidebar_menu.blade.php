@@ -73,6 +73,9 @@
         <a class="nav-link collapsed" href="{{ route('reports.metric_summary') }}">
           <i class="bi bi-circle"></i><span>Metrics Summary</span>
         </a>
+        <a class="nav-link collapsed" href="{{ route('reports.attendance_summary') }}">
+          <i class="bi bi-circle"></i><span>Attendance Summary</span>
+        </a>
         <a class="nav-link collapsed" href="{{ route('reports.team_member_summary') }}">
           <i class="bi bi-circle"></i><span>Team Members Summary</span>
         </a>
@@ -184,6 +187,9 @@
       <li class="nav-item">
         <a class="nav-link collapsed" href="{{ route('reports.metric_summary') }}">
           <i class="bi bi-circle"></i><span>Metric Summary</span>
+        </a>
+        <a class="nav-link collapsed" href="{{ route('reports.attendance_summary') }}">
+          <i class="bi bi-circle"></i><span>Attendance Summary</span>
         </a>
         <a class="nav-link collapsed" href="{{ route('reports.team_member_summary') }}">
           <i class="bi bi-circle"></i><span>Team Member Summary</span>

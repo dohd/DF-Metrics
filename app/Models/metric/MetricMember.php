@@ -2,10 +2,13 @@
 
 namespace App\Models\metric;
 
+use App\Models\metric\Traits\MetricMemberRelationship;
 use Illuminate\Database\Eloquent\Model;
 
 class MetricMember extends Model
 {
+    use MetricMemberRelationship;
+    
     /**
      * The database table used by the model.
      * @var string

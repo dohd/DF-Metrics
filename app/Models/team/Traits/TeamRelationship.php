@@ -5,6 +5,7 @@ namespace App\Models\team\Traits;
 use App\Models\assign_score\AssignScore;
 use App\Models\memberlist\Memberlist;
 use App\Models\metric\Metric;
+use App\Models\metric\MetricMember;
 use App\Models\programme\Programme;
 use App\Models\team\TeamMember;
 use App\Models\team\TeamSize;
@@ -12,6 +13,11 @@ use App\Models\team\VerifyMember;
 
 trait TeamRelationship
 {
+    public function metricMembers()
+    {
+        return $this->hasMany(MetricMember::class);
+    }
+
     public function memberlist()
     {
         return $this->belongsTo(Memberlist::class);
@@ -52,6 +58,6 @@ trait TeamRelationship
 
     public function metrics()
     {
-        return $this->hasMany(Metric::class)->withoutGlobalScopes();
+        return $this->hasMany(Metric::class);
     }
 }
