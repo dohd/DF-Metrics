@@ -87,8 +87,8 @@
                 <tr class="heading">
                     <th>#</th>
                     <th>Team</th>
-                    <th>Member Category</th>
                     <th>Member Name</th>
+                    <th>Member Category</th>
                     <th>Residence</th>
                     <th>Phone No.</th>
                     <th>Age Group</th>
@@ -99,22 +99,26 @@
             <tbody>
                 @php $c = 0; @endphp
                 @foreach ($records as $i => $team)
-                    @foreach ($team->verify_members as $j => $verifyMember)
+                    @foreach ($team->members as $j => $member)
                         @php 
                             $c++;
-                            $teamMember = optional($verifyMember->teamMember);
-                            $memberlistItem = optional($teamMember->memberlistItem); 
+                            $verifyMember = optional($member->verify_members->last()); 
+                            $memberlistItem = optional(@$verifyMember->teamMember->memberlistItem); 
                         @endphp
                         <tr class="dotted">
                             <td>{{ $c }}</td>
                             <td>{{ $team->name }}</td>
-                            <td>{{ ucfirst($verifyMember->category) }}</td>
                             <td>{{ $memberlistItem->member_name }}</td>
-                            <td>{{ $memberlistItem->residence }}</td>
-                            <td>{{ $memberlistItem->phone_no }}</td>
-                            <td>{{ @$memberlistItem->age_group->bracket }}</td>
-                            <td>{{ @$memberlistItem->ministry->name }}</td>
-                            <td>{{ @$memberlistItem->department->name }}</td>
+                            @if ($verifyMember->category)
+                                <td>{{ ucfirst($verifyMember->category) }}</td>
+                                <td>{{ $memberlistItem->residence }}</td>
+                                <td>{{ $memberlistItem->phone_no }}</td>
+                                <td>{{ @$memberlistItem->age_group->bracket }}</td>
+                                <td>{{ @$memberlistItem->ministry->name }}</td>
+                                <td>{{ @$memberlistItem->department->name }}</td>
+                            @else
+                                <td colspan="6" style="color: red;">Pending verification</td>
+                            @endif
                         </tr>
                     @endforeach
                 @endforeach

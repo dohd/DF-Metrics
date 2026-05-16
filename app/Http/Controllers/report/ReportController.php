@@ -88,28 +88,22 @@ class ReportController extends Controller
         }
 
         $input = inputClean($request->except('_token'));
+        
         $start = Carbon::parse(request('month') . '-01');
+        $input['date_from'] = $start->startOfMonth()->format('Y-m-d');
+        $input['date_to'] = $start->endOfMonth()->format('Y-m-d');
 
         $filename = 'Team Member Summary';
         $meta['title'] = 'Team Member Summary';
         $meta['date_from'] = $start->startOfMonth()->format('d-m-Y');
         $meta['date_to'] = $start->endOfMonth()->format('d-m-Y');
-        $input['date_from'] = $start->startOfMonth()->format('Y-m-d');
-        $input['date_to'] = $start->endOfMonth()->format('Y-m-d');
         
         $records = Team::when(request('team_id'), fn($q) => $q->where('id', request('team_id')))
-            ->whereHas('verify_members', function($q) use($input) {
-                $q->whereBetween('date', [$input['date_from'], $input['date_to']]);
-                $q->whereHas('teamMember.memberlistItem');
-            })
             ->with([
-                'verify_members' => function($q) use($input) {
+                'members.verify_members' => function($q) use($input) {
                     $q->whereBetween('date', [$input['date_from'], $input['date_to']])
-                    ->whereHas('teamMember.memberlistItem')
-                    ->selectRaw('MIN(team_id) team_id, team_member_id, category, COUNT(*) count')
-                    ->groupBy('team_member_id', 'category');
+                        ->whereHas('teamMember');
                 },
-                'verify_members.teamMember.memberlistItem',
             ])
             ->get();
         
