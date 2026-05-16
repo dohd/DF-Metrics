@@ -73,7 +73,7 @@ class TeamController extends Controller
 
             DB::commit();
 
-            return redirect(route('teams.index'))->with(['success' => 'Team created successfully']);
+            return redirect(route('teams.index'))->with(['success' => 'Resource: '. $team->name .' created successfully']);
         } catch (\Throwable $th) {
             return errorHandler('Error creating Team!', $th);
         }
@@ -171,19 +171,41 @@ class TeamController extends Controller
                 $rowCategories = $memberCategories[$key] ?? [];
                 $memberIds = $checkedRowIds[$key] ?? [];
                 $teamMembers = $team->members->whereIn('id', $memberIds);
-                // delete non-verified records 
+
+                // delete unchecked members
+                if ($teamMembers->isNotEmpty()) {
+                    $team->verify_members()
+                        ->where('date', $date)
+                        ->whereNotIn('team_member_id', $teamMembers->pluck('id'))
+                        ->delete();                    
+                }
+                // remove duplicates
                 $team->verify_members()
                     ->whereNotIn('date', $verifiedDates)
                     ->whereYear('date', $year)
                     ->delete();
+
+                $newlyCheckedIds = collect($memberIds)
+                    ->diff($team->verify_members->where('date', $date)->pluck('team_member_id'))
+                    ->values();
                 foreach ($teamMembers as $member) {
-                    if (!in_array($date, $verifiedDates->toArray())) {
+                    // check if date has been posted
+                    if (in_array($date, $verifiedDates->toArray())) {
+                        if (in_array(strval($member->id), $newlyCheckedIds->toArray())) {
+                            $verifyMembersData[] = [
+                                'team_member_id' => $member->id,
+                                'category' => $rowCategories[$member->id] ?? $member->category,
+                                'date' => $date,
+                                'checked' => 1,
+                            ]; 
+                        }
+                    } else {
                         $verifyMembersData[] = [
                             'team_member_id' => $member->id,
                             'category' => $rowCategories[$member->id] ?? $member->category,
                             'date' => $date,
                             'checked' => 1,
-                        ];                     
+                        ]; 
                     }
                 }
 
@@ -227,9 +249,9 @@ class TeamController extends Controller
             }
 
             DB::commit();
-            return redirect(route('teams.index'))->with(['success' => 'Team updated successfully']);
+            return redirect(route('teams.index'))->with(['success' => 'Resource: '. $team->name .' updated successfully']);
         } catch (\Throwable $th) {
-            return errorHandler('Error updating Team!', $th);
+            return errorHandler('Error updating resource: '. $team->name .'!', $th);
         }
     }
 
@@ -245,6 +267,7 @@ class TeamController extends Controller
         // if (auth()->user()->user_type != 'chair') {
         //     return errorHandler("You don't have the rights to delete a team!");
         // }
+        $teamName = $team->name;
 
         try {   
             DB::beginTransaction();    
@@ -253,9 +276,9 @@ class TeamController extends Controller
             $team->delete();
 
             DB::commit();
-            return redirect(route('teams.index'))->with(['success' => 'Team deleted successfully']);
+            return redirect(route('teams.index'))->with(['success' => 'Resource: '. $teamName .' deleted successfully']);
         } catch (\Throwable $th) {
-            return errorHandler('Error deleting Team!', $th);
+            return errorHandler('Error deleting resource: '. $teamName .'!', $th);
         }
     }
 
