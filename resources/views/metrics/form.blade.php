@@ -238,9 +238,13 @@
             // member amount collection
             const metric = $('#programme :selected').attr('metric');
             if (metric === 'Attendance') {
-                $('.member-amount').removeClass('d-none');
+                $('.member-amount').each(function() {
+                    if ($(this).closest('.member-check').prop('checked')) {
+                        $(this).removeClass('d-none').prop('disabled', false);                        
+                    }
+                })
             } else {
-                $('.member-amount').addClass('d-none');
+                $('.member-amount').addClass('d-none').prop('disabled', true);
             }            
         });
     });
@@ -308,14 +312,20 @@
 
     const metricMembers = @json($metric->metricMembers ?? []);
     if (metricMembers.length) {
+        console.log(metricMembers.length)
         renderMonthCheckboxes()
         .then(resp => {
             // member amount collection
             const metric = $('#programme :selected').attr('metric');
             if (metric === 'Attendance') {
-                $('.member-amount').removeClass('d-none');
+                $('.member-amount').each(function() {
+                    {{-- $(this).removeClass('d-none').prop('disabled', false);                        
+                    console.log($(this).closest('input.member-check')[0])
+                    if ($(this).closest('.member-check').prop('checked')) {
+                    } --}}
+                })
             } else {
-                $('.member-amount').addClass('d-none');
+                $('.member-amount').addClass('d-none').prop('disabled', true);
             }            
         });
     }
