@@ -215,8 +215,15 @@ class MemberListsController extends Controller
                 }                
             } else {
                 $memberlist->team()->update(['name' => $memberlist->dfname->name]);
+
+                // delete detached records
+                $memberlist->team->members()
+                    ->whereNotIn('memberlist_item_id', $memberlist->items->pluck('id'))
+                    ->doesntHave('verify_members')
+                    ->delete();
                 foreach ($memberlist->items as $item) {
-                    $memberlist->team->members()->updateOrCreate(['memberlist_item_id' => $item->id], [
+                    $memberlist->team->members()
+                    ->updateOrCreate(['memberlist_item_id' => $item->id], [
                         'full_name' => $item->member_name,
                         'df_name' => $memberlist->dfname->name,
                         'phone_no' => $item->phone_no,
@@ -241,7 +248,8 @@ class MemberListsController extends Controller
      */
     public function destroy(Memberlist $memberlist)
     {
-        if ($memberlist->team) {
+        // check if has verified members
+        if ($memberlist->team->members()->whereHas('verify_members')->exists()) {
             return errorHandler('Member list is attached to team: ' . $memberlist->team->name);
         }
 
