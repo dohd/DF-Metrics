@@ -18,10 +18,13 @@ class ReportController extends Controller
     public function attendanceSummary(Request $request)
     {
         if (!$request->post()) {
-            $teams = Team::whereHas('verify_members.teamMember.memberlistItem')
+            $teams = Team::whereHas('metrics.programme', fn($q) => $q->where('metric', 'Attendance'))
                 ->with(['verify_members'])
                 ->get();
-            $programmes = Programme::whereHas('metrics')->where('is_active', 1)->get();
+            $programmes = Programme::where('metric', 'Attendance')
+                ->whereHas('metrics')
+                ->where('is_active', 1)
+                ->get();
             return view('reports.attendance_summary', compact('teams', 'programmes'));
         }
 
@@ -76,7 +79,7 @@ class ReportController extends Controller
     public function teamMemberSummary(Request $request)
     {
         if (!$request->post()) {
-            $teams = Team::whereHas('verify_members.teamMember.memberlistItem')
+            $teams = Team::whereHas('members.memberlistItem')
                 ->with(['verify_members'])
                 ->get();
             $monthSet = $teams->flatMap(fn($team) => $team->verify_members->pluck('date'))
@@ -99,11 +102,14 @@ class ReportController extends Controller
         $meta['date_to'] = $start->endOfMonth()->format('d-m-Y');
         
         $records = Team::when(request('team_id'), fn($q) => $q->where('id', request('team_id')))
+            ->whereHas('members.memberlistItem')
             ->with([
+                'members.memberlistItem',
                 'members.verify_members' => function($q) use($input) {
                     $q->whereBetween('date', [$input['date_from'], $input['date_to']])
                         ->whereHas('teamMember');
                 },
+                'members.verify_members.teamMember.memberlistItem',
             ])
             ->get();
         

@@ -103,7 +103,7 @@
                         @php 
                             $c++;
                             $verifyMember = optional($member->verify_members->last()); 
-                            $memberlistItem = optional(@$verifyMember->teamMember->memberlistItem); 
+                            $memberlistItem = optional(@$verifyMember->teamMember->memberlistItem ?? $member->memberlistItem); 
                         @endphp
                         <tr class="dotted">
                             <td>{{ $c }}</td>
