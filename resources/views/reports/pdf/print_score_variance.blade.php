@@ -70,7 +70,7 @@
         <table width="100%" style="border-bottom: 0.8mm solid #0f4d9b;">
             <tr>
                 <td style="text-align: center;" width="100%" class="headerData">
-                    <span style="font-size:24pt; color:#0f4d9b; text-transform:uppercase;"><b>{{ auth()->user()->company->name }}</b></span>
+                    <span style="font-size:24pt; color:#0f4d9b; text-transform:uppercase;"><b>{{ optional(auth()->user()->company)->name }}</b></span>
                 </td>
             </tr>
         </table>
@@ -78,7 +78,7 @@
         <table width="100%" style="font-size:10pt;margin-top:10px;">
             <tr>
                 <td style="text-align: center;" width="100%" class="headerData">
-                    <span style="font-size:16pt; color:#0f4d9b; text-transform:uppercase;"><b>{{ $meta['title'] }} <br> {{ $meta['team']->name }} </b></span>
+                    <span style="font-size:16pt; color:#0f4d9b; text-transform:uppercase;"><b>{{ $meta['title'] }} <br> {{ @$meta['team']->name }} </b></span>
                 </td>
             </tr>
         </table>

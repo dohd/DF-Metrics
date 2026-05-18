@@ -429,7 +429,7 @@ class ReportController extends Controller
     public function scoreVariance(Request $request)
     {
         if (!$request->post()) {
-            $teams = Team::get();
+            $teams = Team::whereHas('assigned_scores')->get();
             return view('reports.score_variance', compact('teams'));
         }
 
