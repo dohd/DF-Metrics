@@ -1,7 +1,11 @@
 @foreach ($teamMembers as $key => $row)
   @php
     $verifyMember = optional($row->verify_members->sortByDesc('id')->first());
-    $metricMember = optional($row->metricMembers->where('checked', 1)->first());
+    if (request('metric_id')) {
+      $metricMember = optional($row->metricMembers->where('metric_id', request('metric_id'))->where('checked', 1)->first());
+    } else {
+      $metricMember = optional($row->metricMembers->where('checked', 1)->first());
+    }
   @endphp
   <div class="col-12 col-md-6 col-lg-4">
     <div class="form-check border rounded px-3 py-2 h-100">

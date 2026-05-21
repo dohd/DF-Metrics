@@ -202,7 +202,8 @@
         $('.member-checkbox-grid').html('');
         return $.post("{{ route('metrics.verified_team_members') }}", {
             team_id: $('#team').val(),
-            is_metric_edit: "{{ @$metric->id }}",
+            is_metric_edit: "{{ isset($metric->id)? 1 : null }}",
+            metric_id: "{{ @$metric->id }}",
         })
         .then(resp => {
             $('.member-checkbox-grid').html(resp);
@@ -211,21 +212,37 @@
     }
 
     // ========= select/clear all =========
-    $(document).on('click', '.select-all', function(){
+    $(document).on('click', '.select-all', function() {
         $('.member-checkbox-grid').find('input.member-check').prop('checked', true);
         countTeam();
     });
 
-    $(document).on('click', '.clear-all', function(){
+    $(document).on('click', '.clear-all', function() {
         $('.member-checkbox-grid').find('input.member-check').prop('checked', false);
         countTeam();
     });
 
-    $(document).on('change', 'input.member-check', function(){
+    $(document).on('change', 'input.member-check', function() {
         countTeam();
+        // member amount collection
+        const $input = $(this).siblings('.form-check-label').find('.member-amount');
+        if ($(this).prop('checked')) {
+            $input.removeClass('d-none').prop('disabled', false);
+        } else {
+            $input.val('').addClass('d-none').prop('disabled', true);
+        }
+
+        let totalAmount = 0;
+        $('.member-check').each(function() {
+            const $input = $(this).siblings('.form-check-label').find('.member-amount');
+            if ($(this).prop('checked')) {
+                totalAmount += accounting.unformat($input.val());
+            } 
+        });
+        $('#collected_amount').val(accounting.formatNumber(totalAmount));
     });
 
-    $(document).on('change', 'input[name="team_total"]', function(){
+    $(document).on('change', 'input[name="team_total"]', function() {
         if ($('input.member-check').length) {
             countTeam();
         }
@@ -238,11 +255,14 @@
             // member amount collection
             const metric = $('#programme :selected').attr('metric');
             if (metric === 'Attendance') {
-                $('.member-amount').each(function() {
-                    if ($(this).closest('.member-check').prop('checked')) {
-                        $(this).removeClass('d-none').prop('disabled', false);                        
+                $('.member-check').each(function() {
+                    const $input = $(this).siblings('.form-check-label').find('.member-amount');
+                    if ($(this).prop('checked')) {
+                        $input.removeClass('d-none').prop('disabled', false);
+                    } else {
+                        $input.val('').addClass('d-none').prop('disabled', true);
                     }
-                })
+                });
             } else {
                 $('.member-amount').addClass('d-none').prop('disabled', true);
             }            
@@ -291,9 +311,7 @@
         $('#collected_amount').val(accounting.formatNumber(totalAmount));
     });
 
-
-
-    // on editing
+    // =============== Edit Mode ========================
     const metric = @json(@$metric);
     if (metric?.id) {
         $('#programme').change();
@@ -312,17 +330,18 @@
 
     const metricMembers = @json($metric->metricMembers ?? []);
     if (metricMembers.length) {
-        console.log(metricMembers.length)
         renderMonthCheckboxes()
         .then(resp => {
             // member amount collection
             const metric = $('#programme :selected').attr('metric');
             if (metric === 'Attendance') {
-                $('.member-amount').each(function() {
-                    {{-- $(this).removeClass('d-none').prop('disabled', false);                        
-                    console.log($(this).closest('input.member-check')[0])
-                    if ($(this).closest('.member-check').prop('checked')) {
-                    } --}}
+                $('.member-check').each(function() {
+                    const $input = $(this).siblings('.form-check-label').find('.member-amount');
+                    if ($(this).prop('checked')) {
+                        $input.removeClass('d-none').prop('disabled', false);
+                    } else {
+                        $input.val('').addClass('d-none').prop('disabled', true);
+                    }
                 })
             } else {
                 $('.member-amount').addClass('d-none').prop('disabled', true);

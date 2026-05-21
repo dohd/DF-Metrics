@@ -127,9 +127,8 @@ class MetricController extends Controller
             // create members data
             $n = count($teamMembersData['team_member_id'] ?? []);
             if ($n > 0) {
-                unset($teamMembersData['member_collected_amount']);
                 if (isset($teamMembersData['member_collected_amount'])) {
-                    // $teamMembersData['member_collected_amount'] = array_map(fn($v) => numberClean($v),  $teamMembersData['member_collected_amount']);
+                    $teamMembersData['member_collected_amount'] = array_map(fn($v) => numberClean($v),  $teamMembersData['member_collected_amount']);
                 }
                 $teamMembersData = array_replace($teamMembersData, [
                     'metric_id' => array_fill(0, $n, $metric->id),
@@ -253,9 +252,8 @@ class MetricController extends Controller
             $metric->metricMembers()->delete();
             $n = count($teamMembersData['team_member_id'] ?? []);
             if ($n > 0) {
-                unset($teamMembersData['member_collected_amount']);
                 if (isset($teamMembersData['member_collected_amount'])) {
-                    // $teamMembersData['member_collected_amount'] = array_map(fn($v) => numberClean($v),  $teamMembersData['member_collected_amount']);
+                    $teamMembersData['member_collected_amount'] = array_map(fn($v) => numberClean($v),  $teamMembersData['member_collected_amount']);
                 }
                 $teamMembersData = array_replace($teamMembersData, [
                     'metric_id' => array_fill(0, $n, $metric->id),
@@ -266,7 +264,6 @@ class MetricController extends Controller
                     'user_id' => array_fill(0, $n, auth()->id()),
                     'ins' => array_fill(0, $n, auth()->user()->ins),
                 ]);
-                // dd($teamMembersData, request()->all());
                 $teamMembersData = databaseArray($teamMembersData);
                 $metric->metricMembers()->insert($teamMembersData);                
             }
